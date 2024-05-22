@@ -1,5 +1,6 @@
 import key_store_interface as ksi
 import PGPCore as pgpc
+import os
 
 print("Interface test")
 
@@ -51,3 +52,4 @@ with open("temp_data.txt", "rb") as f:
     print(f.read())
 
 print("END PGPCore test")
+os.remove("temp_data.txt")
