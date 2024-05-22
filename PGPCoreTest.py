@@ -1,3 +1,4 @@
+import key_store_interface as ksi
 import unittest
 import PGPCore as pgpc
 import os

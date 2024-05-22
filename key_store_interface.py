@@ -28,5 +28,3 @@ class PrivateKeyStore():
     # -- user can have more than one e-mail addr
     def get_key_by_uid(self, userId : str, key_passwd : str) -> int: pass
         # returns public key as int
-
-
