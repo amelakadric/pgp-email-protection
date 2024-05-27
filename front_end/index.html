@@ -6,20 +6,16 @@
 <br/><br/><br/>
 <form><div class="container text-center">
     <div class="row">
-        <div class="alt_input input_text collapse">
+        <div id="alt_input1">
             <div class="col">
                 <span class="input-group-text">Enter your message here</span>
-                <textarea class="form-control" aria-label="With textarea"></textarea>
+                <textarea class="form-control" aria-label="With textarea" id="input_of_type_textarea"></textarea>
             </div>
         </div>
-        <div class="alt_input input_file collapse">
+        <div id="alt_input2">
             <div class="col">
-                <input type="file" class="btn-check" id="file" autocomplete="off">
-                <div class="text-success" role="status">
-                    <label class="btn btn-outline-success btn-lg" for="file">
-                        <br/> Select the file <br/> with your message <br/> &nbsp;
-                    </label>
-                </div>
+                <label for="formFileLg" class="form-label">Select the file with your message</label>
+                <input class="form-control form-control-lg text-success" id="input_of_type_file" type="file" />
             </div>
         </div>
     </div>
@@ -52,7 +48,7 @@
             </select>
         </div>
         <div class="col"></div>
-        <div class="col"><button type="submit" class="btn btn-success">Submit</button></div>
+        <div class="col"><button type="submit" class="btn btn-success" id="encr_message">Submit</button></div>
         <div class="col"></div>
     </div>
 </div></form>
