@@ -22,7 +22,7 @@
         console.log("text_or_file"); console.log($("#input_type").val());
 
         $.ajax({
-            url: "index.html",
+            url: "http:localhost:5000/",
             method: "POST",        
             data: { 
                 encrypt: $("#encrypt").is(':checked'),
