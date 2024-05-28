@@ -1,5 +1,4 @@
 $(document).ready(function() {
- window.addEventListener('load', function () {
     let selector = null;
     $("#alt_input1").addClass("collapse");
     $("#alt_input2").addClass("collapse");
@@ -13,49 +12,32 @@ $(document).ready(function() {
 
     $("#encr_message").click(function() {
 
-        let site_url = "http://192.168.0.27:5000"
+        let site_url = "http://localhost:5000"
 
-        console.log($SCRIPT_ROOT)
-
-        $.ajax({
-            url: site_url + "/",
-            method: "POST",        
-            data: { 
-                encrypt: $("#encrypt").is(':checked'),
-                sign: $("#sign").is(":checked"),
-                compress: $("#compress").is(":checked"),
-                radix64: $("#radix64").is(":checked"),
-                text: $("textarea#input_of_type_textarea").val(),
-                file: $("#input_of_type_file")[0].files[0],
-                text_or_file: $("#input_type").val()
-            }, 
-            contentType: false,
-            cache: false,
-            processData: false,
-            dataType: 'json',
-            success: function(data){ alert("success"); console.log(JSON.stringify(data)); },
-            error: function(errMsg) {
-                console.log(  JSON.stringify(errMsg) );
-            }
-        });
-
-
-        site_url = "http://127.0.0.1:5000/"
-
-        $.getJSON(site_url + "//encr_api", {
-            encrypt: $("#encrypt").is(':checked'),
+        let formdata1 = {
+            enc_msg: $("#enc_msg").is(':checked'),
             sign: $("#sign").is(":checked"),
             compress: $("#compress").is(":checked"),
             radix64: $("#radix64").is(":checked"),
-            text: $("textarea#input_of_type_textarea").val(),
+            text: $("#input_of_type_textarea").val(),
             file: $("#input_of_type_file")[0].files[0],
             text_or_file: $("#input_type").val()
-        }, function(data){
-            alert(data)
-        });
+        };
 
-
-    });
-
+        let formdata2 = {
+            type: "POST",
+            contentType: "application/json",
+            headers: {                                  
+                'Accept': 'application/json',
+                'Content-Type': 'application/json' 
+            },
+            data: JSON.stringify(formdata1),
+            dataType: 'json',
+            url: site_url + "/encr_api",
+            success: function(data) {
+                console.log(JSON.stringify(data));
+            }
+        };
+        $.ajax(formdata2);
     });
 });
