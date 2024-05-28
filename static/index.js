@@ -1,4 +1,4 @@
-
+$(document).ready(function() {
  window.addEventListener('load', function () {
     let selector = null;
     $("#alt_input1").addClass("collapse");
@@ -13,16 +13,12 @@
 
     $("#encr_message").click(function() {
 
-        console.log("encrypt"); console.log($("#encrypt").is(":checked"));
-        console.log("sign"); console.log($("#sign").is(":checked"));
-        console.log("compress"); console.log($("#compress").is(":checked"));
-        console.log("radix64"); console.log($("#radix64").is(":checked"));
-        console.log("text"); console.log($("#input_of_type_textarea").val());
-        console.log("file"); console.log($("#input_of_type_file")[0].files[0]);
-        console.log("text_or_file"); console.log($("#input_type").val());
+        let site_url = "http://192.168.0.27:5000"
+
+        console.log($SCRIPT_ROOT)
 
         $.ajax({
-            url: "http:localhost:5000/",
+            url: site_url + "/",
             method: "POST",        
             data: { 
                 encrypt: $("#encrypt").is(':checked'),
@@ -37,12 +33,29 @@
             cache: false,
             processData: false,
             dataType: 'json',
-            success: function(data){ console.log(JSON.stringify(data)); },
+            success: function(data){ alert("success"); console.log(JSON.stringify(data)); },
             error: function(errMsg) {
-                console.log( JSON.stringify(errMsg) );
+                console.log(  JSON.stringify(errMsg) );
             }
         });
 
+
+        site_url = "http://127.0.0.1:5000/"
+
+        $.getJSON(site_url + "//encr_api", {
+            encrypt: $("#encrypt").is(':checked'),
+            sign: $("#sign").is(":checked"),
+            compress: $("#compress").is(":checked"),
+            radix64: $("#radix64").is(":checked"),
+            text: $("textarea#input_of_type_textarea").val(),
+            file: $("#input_of_type_file")[0].files[0],
+            text_or_file: $("#input_type").val()
+        }, function(data){
+            alert(data)
+        });
+
+
     });
 
+    });
 });
