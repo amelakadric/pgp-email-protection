@@ -51,13 +51,16 @@ class PublicKeyStore:
     def remove_key(self, key_id):
         if key_id in self.keys_by_kid:
             public_key, _ = self.keys_by_kid.pop(key_id)
+            to_remove = []
             for user_id, keys in self.keys_by_uid.items():
                 for key in keys:
                     if key[0] == public_key:
-                        keys.remove(key)
-                        if not keys:
-                            del self.keys_by_uid[user_id]
+                        to_remove.append((user_id, key))
                         break
+            for user_id, key in to_remove:
+                self.keys_by_uid[user_id].remove(key)
+                if not self.keys_by_uid[user_id]:
+                    del self.keys_by_uid[user_id]
             self.save_keys()
 
     def get_key_by_kid(self, keyId: int) -> rsa.RSAPublicKey:
@@ -152,13 +155,16 @@ class PrivateKeyStore:
     def remove_key(self, key_id):
         if key_id in self.keys_by_kid:
             private_key_tuple = self.keys_by_kid.pop(key_id)
+            to_remove = []
             for user_id, keys in self.keys_by_uid.items():
                 for key in keys:
                     if key[0] == private_key_tuple[0]:
-                        keys.remove(key)
-                        if not keys:
-                            del self.keys_by_uid[user_id]
+                        to_remove.append((user_id, key))
                         break
+            for user_id, key in to_remove:
+                self.keys_by_uid[user_id].remove(key)
+                if not self.keys_by_uid[user_id]:
+                    del self.keys_by_uid[user_id]
             self.save_keys()
 
     def get_key_by_kid(self, keyId: int, key_passwd: str) -> rsa.RSAPrivateKey:

@@ -25,6 +25,12 @@ def generate_key_pair():
      return jsonify({"status": "success"})	
 	
 
+@app.route("/remove_key", methods=["DELETE"])
+def remove_key():
+     key_manager.remove_key(request.json["key_id"])
+     return jsonify({"status": "success"})	
+	
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

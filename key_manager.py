@@ -59,24 +59,14 @@ class KeyManager:
                     "key_id": key_id
                 })
 
-        # Print keys
-        print("Public Keys:")
-        for key_info in public_keys:
-            print(f"User ID: {key_info['user_id']}")
-            print(f"Public Key: {key_info['public_key']}")
-            print(f"Timestamp: {key_info['timestamp']}")
-            print(f"Key ID: {key_info['key_id']}")
-            print()
-
-        print("Private Keys:")
-        for key_info in private_keys:
-            print(f"User ID: {key_info['user_id']}")
-            print(f"Encrypted Private Key: {key_info['encrypted_private_key']}")
-            print(f"Timestamp: {key_info['timestamp']}")
-            print(f"Key ID: {key_info['key_id']}")
-            print()
 
         return {"public_keys": public_keys, "private_keys": private_keys}
+    
+
+    def remove_key(self, key_id):
+        self.public_key_store.remove_key(key_id)
+        self.private_key_store.remove_key(key_id)
+        print(f"Removed key with ID: {key_id}")
 
     
     def access_private_key(self, key_id):
