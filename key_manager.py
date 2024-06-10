@@ -69,10 +69,71 @@ class KeyManager:
         print(f"Removed key with ID: {key_id}")
 
     
-    def access_private_key(self, key_id):
-        password = getpass.getpass("Enter the password for the private key: ")
+    def access_private_key(self, key_id, password):
+        # password = getpass.getpass("Enter the password for the private key: ")
         private_key = self.private_key_store.get_key_by_kid(key_id, password)
         if private_key:
             print(f"Access granted to private key: {private_key}")
         else:
             print("Access denied. Incorrect password or key not found.")
+    
+
+    def get_public_key_by_id(self, key_id):
+        public_key = self.public_key_store.get_key_by_kid(key_id)
+        if public_key:
+            return {
+                "public_key": public_key.public_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PublicFormat.SubjectPublicKeyInfo
+                ).decode(),
+                "key_id": key_id
+            }
+        else:
+            return None
+
+    def get_private_key_by_id(self, key_id, password):
+        # password = getpass.getpass("Enter the password for the private key: ")
+        private_key = self.private_key_store.get_key_by_kid(key_id, password)
+        if not private_key:
+            return None # Access denied
+        if private_key:
+            return {
+                "private_key": private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.PKCS8,
+                    encryption_algorithm=serialization.NoEncryption()
+                ).decode(),
+                "key_id": key_id
+            }
+        else:
+            return None
+
+    def get_public_keys_by_user_id(self, user_id):
+        public_keys = self.public_key_store.get_key_by_uid(user_id)
+        return [
+            {
+                "public_key": public_key.public_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PublicFormat.SubjectPublicKeyInfo
+                ).decode(),
+                "user_id": user_id
+            }
+            for public_key in public_keys
+        ]
+
+    def get_private_keys_by_user_id(self, user_id, password):
+        # password = getpass.getpass("Enter the password for the private keys: ")
+        private_keys = self.private_key_store.get_key_by_uid(user_id, password)
+        if not private_keys:
+            return None # Access denied
+        return [
+            {
+                "private_key": private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.PKCS8,
+                    encryption_algorithm=serialization.NoEncryption()
+                ).decode(),
+                "user_id": user_id
+            }
+            for private_key in private_keys
+        ]
