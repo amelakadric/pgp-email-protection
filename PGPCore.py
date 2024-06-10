@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 import zipfile as zf
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
+import codecs
 
 class PGPCore():
 
@@ -139,6 +140,14 @@ class PGPCore():
                 algorithm=hashes.SHA256(), label=None
             )
         )
+        return self
+    
+    def radix64_encode(self):
+        self.data = codecs.encode(self.data, "base64")
+        return self
+
+    def radix64_decode(self):
+        self.data = codecs.decode(self.data, "base64")
         return self
 
 

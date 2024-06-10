@@ -23,8 +23,6 @@ def list_keys():
 def generate_key_pair():
      key_manager.generate_key_pair(request.json["name"], request.json["email"], request.json["password"], request.json["key_size"])
      return jsonify({"status": "success"})	
-	
-
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

@@ -70,7 +70,11 @@ class PGPCoreTests(unittest.TestCase):
             self.assertIsNone(pgpt.verify_data_signature(signature))
         except InvalidSignature:
             self.assertFalse()
-
+    
+    def test_radix64_idemp(self):
+        tdata = b"Hello there, this is test string"
+        pgpt = pgpc.PGPCore(7, 7, tdata)
+        self.assertEqual(pgpt.radix64_encode().radix64_decode().get_data(), tdata)
 
 if __name__ == '__main__':
     unittest.main()
