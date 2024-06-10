@@ -6,7 +6,7 @@ $(document).ready(function() {
         selector = ".input_" + $(this).val();
         $("#alt_input1").collapse("hide");
         $("#alt_input2").collapse("hide");
-        if (selector == "text") $("#alt_input1").collapse("show");
+        if (selector === ".input_text") $("#alt_input1").collapse("show");
         else $("#alt_input2").collapse("show");
     }); $("#alt_input1").collapse("show");
 
