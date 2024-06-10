@@ -137,3 +137,22 @@ class KeyManager:
             }
             for private_key in private_keys
         ]
+    
+
+    def import_key(self, filepath, user_id, key_passwd):
+        try:
+            with open(filepath, 'rb') as pem_in:
+                pem_data = pem_in.read()
+                private_key = serialization.load_pem_private_key(pem_data, password=key_passwd.encode(), backend=default_backend())
+                public_key = private_key.public_key()
+                self.public_key_store.add_key(public_key, user_id)
+                self.private_key_store.add_key(public_key, private_key, user_id, key_passwd)
+                return {"message": "Key imported successfully."}
+        except Exception as e:
+            return {"message": "Failed to import key.", "error": str(e)}
+
+    def export_public_key(self, key_id, filepath):
+        return self.public_key_store.export_key(key_id, filepath)
+        
+    def export_private_key(self, key_id, filepath, key_passwd):
+        return self.private_key_store.export_key(key_id, filepath, key_passwd)

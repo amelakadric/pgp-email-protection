@@ -49,17 +49,17 @@ class PublicKeyStore:
 
     def remove_key(self, key_id):
         if key_id in self.keys_by_kid:
-            public_key, _ = self.keys_by_kid.pop(key_id)
+            public_key, user_id, _ = self.keys_by_kid.pop(key_id)
             to_remove = []
-            for user_id, keys in self.keys_by_uid.items():
+            for uid, keys in self.keys_by_uid.items():
                 for key in keys:
                     if key[0] == public_key:
-                        to_remove.append((user_id, key))
+                        to_remove.append((uid, key))
                         break
-            for user_id, key in to_remove:
-                self.keys_by_uid[user_id].remove(key)
-                if not self.keys_by_uid[user_id]:
-                    del self.keys_by_uid[user_id]
+            for uid, key in to_remove:
+                self.keys_by_uid[uid].remove(key)
+                if not self.keys_by_uid[uid]:
+                    del self.keys_by_uid[uid]
             self.save_keys()
 
     def get_key_by_kid(self, keyId: int) -> rsa.RSAPublicKey:
@@ -79,6 +79,9 @@ class PublicKeyStore:
             )
             with open(filepath, 'wb') as pem_out:
                 pem_out.write(pem)
+            return True
+        else:  
+            return False
     
     def import_key(self, filepath, user_id):
         with open(filepath, 'rb') as pem_in:
@@ -168,6 +171,7 @@ class PrivateKeyStore:
                     del self.keys_by_uid[user_id]
             self.save_keys()
 
+
     def get_key_by_kid(self, keyId: int, key_passwd: str) -> rsa.RSAPrivateKey:
         key_entry = self.keys_by_kid.get(keyId, None)
         if key_entry and key_entry[1] == key_passwd:
@@ -183,6 +187,9 @@ class PrivateKeyStore:
         if key_entry and key_entry[1] == key_passwd:
             with open(filepath, 'wb') as pem_out:
                 pem_out.write(key_entry[0])
+                return True
+        else:
+            return False
 
     def import_key(self, filepath, user_id, key_passwd):
         with open(filepath, 'rb') as pem_in:

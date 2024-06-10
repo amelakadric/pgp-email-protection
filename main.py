@@ -76,5 +76,40 @@ def get_private_keys_by_user_id(user_id):
     else:
         return jsonify({"message": "Private key not found or access denied."}), 403
 
+@app.route('/import_key', methods=['POST'])
+def import_key():
+    data = request.json
+    filepath = data.get('filepath')
+    user_id = data.get('user_id')
+    key_passwd = data.get('password')
+
+    result = key_manager.import_key(filepath, user_id, key_passwd)
+    if result['message'] == "Key imported successfully.":
+        return jsonify(result), 201
+    else:
+        return jsonify(result), 400
+
+@app.route('/export_public_key/<int:key_id>', methods=['POST'])
+def export_public_key(key_id):
+    data = request.json
+    filepath = data.get('filepath')
+
+    success= key_manager.export_public_key(key_id, filepath)
+    if not success:
+        return jsonify({"message": "Key not found."}), 404
+    return jsonify({"message": "Public key exported successfully."}), 200
+
+@app.route('/export_private_key/<int:key_id>', methods=['POST'])
+def export_private_key(key_id):
+    data = request.json
+    filepath = data.get('filepath')
+    key_passwd = data.get('password')
+
+    success = key_manager.export_private_key(key_id, filepath, key_passwd)
+    print(success)
+    if not success:
+        return jsonify({"message": "Access denied. Incorrect password or key not found."}), 403
+    return jsonify({"message": "Private key exported successfully."}), 200
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
