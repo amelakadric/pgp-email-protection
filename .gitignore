@@ -5,3 +5,4 @@ env/
 temp_data.txt
 *.zip
 *temp_data*
+pgp_facade_test.pgp

@@ -98,14 +98,14 @@ class PGPCore():
     def zip_to_file(self, filename: str):
         if not filename.endswith(".zip"): filename += ".zip"
         self.write_data_to_tmp()
-        with zf.ZipFile(filename, "w") as zipf:
+        with zf.ZipFile(filename, "w", zf.ZIP_DEFLATED) as zipf:
             zipf.write(self.TEMP_DATA_FILE)
         self.del_temp_data()
         return self
     
     def unzip_from_file(self, filename: str):
         if not filename.endswith(".zip"): filename += ".zip"
-        with zf.ZipFile(filename, "r") as zipf:
+        with zf.ZipFile(filename, "r", zf.ZIP_DEFLATED) as zipf:
             zipf.extract(member=self.TEMP_DATA_FILE, path="./arch_" + self.TEMP_DATA_FILE)
         os.replace("./arch_" + self.TEMP_DATA_FILE + "/" + self.TEMP_DATA_FILE, "./" + self.TEMP_DATA_FILE)
         os.rmdir("./arch_" + self.TEMP_DATA_FILE)
