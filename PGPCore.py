@@ -3,7 +3,10 @@ import hashlib as hl
 import cryptography.hazmat.primitives.ciphers.algorithms as cphr_algo
 import cryptography.hazmat.primitives.ciphers as cphr
 from cryptography.hazmat.primitives.ciphers.modes import CFB
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
 import zipfile as zf
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
 
 class PGPCore():
 
@@ -12,30 +15,46 @@ class PGPCore():
     SKEY_SIZE_IN_BYTES = 16 # 16B = 128b - size of session key
     TRIPPLE_DES_BLOCK_SIZE = 8 # 8B = 64b
     AES128_BLOCK_SIZE = 16 # 16B = 128b
-    TEMP_DATA_FILE = "temp_data.txt"
+    TEMP_DATA_FILE = "temp_data.tmp"
 
-    def __init__(self, private_key : int, public_key : int, data, session_key=None, iv=None):
-        self.private_key = private_key
-        self.public_key = public_key
+    def __init__(self, private_key, public_key, data, session_key=None, iv=None):
+        self.private_key : RSAPrivateKey = private_key
+        self.public_key : RSAPublicKey = public_key
         self.data = data
         # symmetric algorithm parameters
         self.session_key = session_key
         self.iv = iv
-        self.signature = None
 
     def get_data(self):
         return self.data
 
-    def get_signature(self):
-        return self.signature
-    
+    # this function is probably not going to get used
     def sha1(self):
-        self.signature = hl.sha1(self.data).digest()
-        return self
+        signature = hl.sha1(self.data).digest()
+        return signature
+
+    def data_signature(self):
+        return self.private_key.sign(
+            self.data, padding.PSS(
+                mgf=padding.MGF1(hashes.SHA1()),
+                salt_length=padding.PSS.MAX_LENGTH),
+            hashes.SHA1()
+        )
+
+    def verify_data_signature(self, signature):
+        return self.public_key.verify(
+            signature, self.data, padding.PSS(
+                mgf=padding.MGF1(hashes.SHA1()),
+                salt_length=padding.PSS.MAX_LENGTH),
+            hashes.SHA1()
+        )
     
     def generate_session_key(self):
         self.session_key = os.urandom(self.SKEY_SIZE_IN_BYTES)
         return self
+    
+    def get_session_key(self):
+        return self.session_key
     
     def tripple_des(self):
         if self.session_key is None: self.generate_session_key()
@@ -54,12 +73,12 @@ class PGPCore():
         return self
 
     def encrypt(self):
-        self.data = self.encryptor.update(bytes(self.data, encoding="UTF-8")) + self.encryptor.finalize()
+        self.data = self.encryptor.update(self.data) + self.encryptor.finalize()
         return self
     
     def decrypt(self):
         self.data = self.decryptor.update(self.data) + self.decryptor.finalize()
-        self.data = self.data.decode(encoding="UTF-8")
+        #self.data = self.data.decode(encoding="UTF-8")
         return self
     
     def del_temp_data(self):
@@ -67,17 +86,11 @@ class PGPCore():
         return self
 
     def write_data_to_tmp(self):
-        if type(self.data) == str:
-            with open(self.TEMP_DATA_FILE, "w") as f: f.write(self.data)
-        else:
-            with open(self.TEMP_DATA_FILE, "wb") as f: f.write(self.data)
+        with open(self.TEMP_DATA_FILE, "wb") as f: f.write(self.data)
         return self
     
     def read_data_from_temp(self):
-        try:
-            with open(self.TEMP_DATA_FILE, "r") as f: self.data = f.read()
-        except UnicodeDecodeError as e:
-            with open(self.TEMP_DATA_FILE, "rb") as f: self.data = f.read()
+        with open(self.TEMP_DATA_FILE, "rb") as f: self.data = f.read()
         self.del_temp_data()
         return self
     
@@ -109,3 +122,23 @@ class PGPCore():
         self.unzip_from_file("tmp_data.zip")
         os.remove("tmp_data.zip")
         return self
+
+    def rsa_publ_encry(self):
+        self.data = self.public_key.encrypt(
+            self.data, padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(), label=None
+            )
+        )
+        return self
+    
+    def rsa_priv_decry(self):
+        self.data = self.private_key.decrypt(
+            self.data, padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(), label=None
+            )
+        )
+        return self
+
+

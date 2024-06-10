@@ -19,12 +19,9 @@ for pr_kid in private_kids:
 for pu_kid in public_kids:
     key_data[pu_kid] = key_data[pu_kid.replace("u", "r")].public_key()
 
-print(key_data)
-
 class MockPUKStore(ksi.PublicKeyStore):
 
     def __init__(self):
-        super.__init__()
         self.my_key_store = key_data
         self.my_kids = public_kids
 
@@ -44,7 +41,6 @@ class MockPUKStore(ksi.PublicKeyStore):
 class MockPRKStore(ksi.PrivateKeyStore):
 
     def __init__(self):
-        super.__init__()
         self.my_key_store = key_data
         self.my_kids = private_kids
 
