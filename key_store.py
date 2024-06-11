@@ -3,13 +3,16 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 from datetime import datetime
+import hashlib
 from key_store_interface import PublicKeyStore as BasePublicKeyStore
+from key_store_interface import PrivateKeyStore as BasePrivateKeyStore
 
 class PublicKeyStore(BasePublicKeyStore):
-
-    def __init__(self, filename='key_store.json'):
+    def __init__(self, filename='private_key_ring.json', public_ring_filename='public_key_ring.json'):
         self.filename = filename
+        self.public_ring_filename = public_ring_filename
         self.load_keys()
+        self.load_public_key_ring()
 
     def load_keys(self):
         try:
@@ -26,6 +29,15 @@ class PublicKeyStore(BasePublicKeyStore):
             self.keys_by_kid = {}
             self.keys_by_uid = {}
 
+    def load_public_key_ring(self):
+        try:
+            with open(self.public_ring_filename, 'r') as file:
+                data = json.load(file)
+                public_keys_data = data.get('public_key_store', {})
+                self.public_key_ring = {int(k): (self.deserialize_public_key(v[0]), v[1], datetime.fromisoformat(v[2]), v[3]) for k, v in public_keys_data.items()}
+        except FileNotFoundError:
+            self.public_key_ring = {}
+
     def save_keys(self):
         try:
             with open(self.filename, 'r') as file:
@@ -39,6 +51,13 @@ class PublicKeyStore(BasePublicKeyStore):
         with open(self.filename, 'w') as file:
             json.dump(data, file, indent=4)
 
+    def save_public_key_ring(self):
+        public_keys_data = {str(k): [self.serialize_public_key(v[0]), v[1], v[2].isoformat(), v[3]] for k, v in self.public_key_ring.items()}
+        data = {'public_key_store': public_keys_data}
+
+        with open(self.public_ring_filename, 'w') as file:
+            json.dump(data, file, indent=4)
+
     def add_key(self, public_key: rsa.RSAPublicKey, user_id: str, name: str):
         key_id = public_key.public_numbers().n % (2 ** 64)
         timestamp = datetime.now()
@@ -47,6 +66,12 @@ class PublicKeyStore(BasePublicKeyStore):
             self.keys_by_uid[user_id] = []
         self.keys_by_uid[user_id].append((public_key, timestamp, name))
         self.save_keys()
+
+    def add_public_key(self, public_key: rsa.RSAPublicKey, user_id: str, name: str):
+        key_id = public_key.public_numbers().n % (2 ** 64)
+        timestamp = datetime.now()
+        self.public_key_ring[key_id] = (public_key, user_id, timestamp, name)
+        self.save_public_key_ring()
 
     def remove_key(self, key_id):
         if key_id in self.keys_by_kid:
@@ -66,10 +91,10 @@ class PublicKeyStore(BasePublicKeyStore):
     def get_key_by_kid(self, keyId: int) -> rsa.RSAPublicKey:
         key_entry = self.keys_by_kid.get(keyId, None)
         return key_entry[0] if key_entry else None
-    
+
     def get_key_by_uid(self, userId: str) -> list:
         return [key[0] for key in self.keys_by_uid.get(userId, [])]
-    
+
     def get_key_by_name(self, name: str) -> int:
         key = self.keys_by_name.get(name, None)
         return key.public_numbers().n if key else None
@@ -85,14 +110,24 @@ class PublicKeyStore(BasePublicKeyStore):
             with open(filepath, 'wb') as pem_out:
                 pem_out.write(pem)
             return True
-        else:  
+        else:
             return False
-    
+
     def import_key(self, filepath, user_id, name):
         with open(filepath, 'rb') as pem_in:
             pem_data = pem_in.read()
             public_key = serialization.load_pem_public_key(pem_data, backend=default_backend())
             self.add_key(public_key, user_id, name)
+
+    def import_public_key(self, filepath, user_id, name):
+        try:
+            with open(filepath, 'rb') as pem_in:
+                pem_data = pem_in.read()
+                public_key = serialization.load_pem_public_key(pem_data, backend=default_backend())
+                self.add_public_key(public_key, user_id, name)
+                return {"message": "Key imported successfully."}
+        except Exception as e:
+            return {"message": "Failed to import key.", "error": str(e)}
 
     @staticmethod
     def serialize_public_key(public_key):
@@ -109,17 +144,8 @@ class PublicKeyStore(BasePublicKeyStore):
         )
 
 
-import json
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.backends import default_backend
-from datetime import datetime
-import hashlib
-from key_store_interface import PrivateKeyStore as BasePrivateKeyStore
-
 class PrivateKeyStore(BasePrivateKeyStore):
-
-    def __init__(self, filename='key_store.json'):
+    def __init__(self, filename='private_key_ring.json'):
         self.filename = filename
         self.load_keys()
 
@@ -138,7 +164,6 @@ class PrivateKeyStore(BasePrivateKeyStore):
             self.keys_by_kid = {}
             self.keys_by_uid = {}
 
-
     def save_keys(self):
         try:
             with open(self.filename, 'r') as file:
@@ -152,26 +177,24 @@ class PrivateKeyStore(BasePrivateKeyStore):
         with open(self.filename, 'w') as file:
             json.dump(data, file, indent=4)
 
-
     def add_key(self, public_key: rsa.RSAPublicKey, private_key: rsa.RSAPrivateKey, user_id: str, key_passwd: str, name: str):
         key_id = public_key.public_numbers().n % (2 ** 64)
         timestamp = datetime.now()
 
         # Hash the password using SHA-1
         key_passwd_hash = hashlib.sha1(key_passwd.encode()).hexdigest()
-        
+
         encrypted_private_key = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.BestAvailableEncryption(key_passwd.encode())
         )
-        
+
         self.keys_by_kid[key_id] = (encrypted_private_key, key_passwd_hash, user_id, timestamp, name)
         if user_id not in self.keys_by_uid:
             self.keys_by_uid[user_id] = []
         self.keys_by_uid[user_id].append((encrypted_private_key, key_passwd_hash, timestamp, name))
         self.save_keys()
-
 
     def remove_key(self, key_id):
         if key_id in self.keys_by_kid:

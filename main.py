@@ -29,7 +29,11 @@ def generate_key_pair():
 @app.route('/list_private_key_ring', methods=['GET'])
 def list_private_key_ring():
     keys = key_manager.list_private_key_ring()
-    print(keys)
+    return jsonify(keys), 200
+
+@app.route('/list_public_key_ring', methods=['GET'])
+def list_public_key_ring():
+    keys = key_manager.list_public_key_ring()
     return jsonify(keys), 200
 
 @app.route('/access_private_key', methods=['POST'])
@@ -120,6 +124,19 @@ def import_key():
         return jsonify(result), 201
     else:
         return jsonify(result), 400
+    
+@app.route('/import_public_key', methods=['POST'])
+def import_public_key():
+    data = request.json
+    filepath = data.get('filepath')
+    user_id = data.get('user_id')
+    name = data.get('name')
+
+    result = key_manager.import_public_key(filepath, user_id, name)
+    if result['message'] == "Key imported successfully.":
+        return jsonify(result), 201
+    else:
+        return jsonify(result), 400
 
 @app.route('/export_public_key/<int:key_id>', methods=['POST'])
 def export_public_key(key_id):
@@ -147,14 +164,11 @@ def export_private_key(key_id):
 @app.route('/export_key_pair/<int:key_id>', methods=['POST'])
 def export_key_pair(key_id):
     data = request.json
-    public_key_filepath = data.get('public_key_filepath')
-    private_key_filepath = data.get('private_key_filepath')
+    filepath = data.get('filepath')
     key_passwd = data.get('password')
 
-    result, status_code = key_manager.export_key_pair(key_id, public_key_filepath, private_key_filepath, key_passwd)
-    return jsonify(result), status_code
-
-
+    result = key_manager.export_key_pair(key_id, filepath, key_passwd)
+    return jsonify(result), 200 if result['message'] == "Key pair exported successfully." else 400
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

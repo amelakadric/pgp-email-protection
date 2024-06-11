@@ -1,3 +1,4 @@
+import hashlib
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -22,37 +23,45 @@ class KeyManager:
         print(f"Generated {key_size}-bit key pair for {name} ({email}).")
 
     def list_private_key_ring(self):
-        # Collect public keys
-        public_keys = []
-        for user_id, keys in self.public_key_store.keys_by_uid.items():
-            for public_key, timestamp, name in keys:
-                key_id = public_key.public_numbers().n % (2 ** 64)
-                public_keys.append({
-                    "user_id": user_id,
+        key_ring = []
+
+        # Collect public and private keys
+        for key_id, key_info in self.private_key_store.keys_by_kid.items():
+            encrypted_private_key, key_passwd_hash, email, timestamp, name = key_info
+            public_key = self.public_key_store.get_key_by_kid(key_id)
+
+            if public_key:
+                key_ring.append({
+                    "timestamp": timestamp.isoformat(),
+                    "name": name,
+                    "key_id": key_id,
                     "public_key": public_key.public_bytes(
                         encoding=serialization.Encoding.PEM,
                         format=serialization.PublicFormat.SubjectPublicKeyInfo
                     ).decode(),
-                    "timestamp": timestamp.isoformat(),
-                    "key_id": key_id,
-                    "name": name
+                    "private_key": encrypted_private_key.decode('utf-8'),
+                    "user_id": email
                 })
 
-        # Collect private keys
-        private_keys = []
-        for key_id, key_info in self.private_key_store.keys_by_kid.items():
-            encrypted_private_key, key_passwd_hash, email, timestamp, name = key_info
-            private_keys.append({
-                "user_id": email,
-                "encrypted_private_key": encrypted_private_key.decode('utf-8'),  # Decode bytes to string
-                "key_passwd_hash": key_passwd_hash,
+        return {"private_key_ring": key_ring}
+
+    def list_public_key_ring(self):
+        public_keys = []
+        for key_id, key_data in self.public_key_store.public_key_ring.items():
+            public_key, user_id, timestamp, name = key_data
+            public_keys.append({
+                "user_id": user_id,
+                "public_key": public_key.public_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PublicFormat.SubjectPublicKeyInfo
+                ).decode(),
                 "timestamp": timestamp.isoformat(),
                 "key_id": key_id,
                 "name": name
-        })
+            })
+        return {"public_key_ring": public_keys}
 
-        return {"public_keys": public_keys, "private_keys": private_keys}
-
+        
 
     def remove_key(self, key_id):
         self.public_key_store.remove_key(key_id)
@@ -161,22 +170,29 @@ class KeyManager:
     def export_private_key(self, key_id, filepath, key_passwd):
         return self.private_key_store.export_key(key_id, filepath, key_passwd)
 
+    def import_public_key(self, filepath, user_id, name):
+        return self.public_key_store.import_public_key(filepath, user_id, name)
 
-    def export_key_pair(self, key_id, public_key_filepath, private_key_filepath, key_passwd):
-        # Export public key
-        public_key_info = self.get_public_key_by_id(key_id)
-        if not public_key_info:
-            return {"message": "Public key not found."}, 404
+    def export_key_pair(self, key_id, filepath, key_passwd):
+        # Export the public key
+        public_key = self.public_key_store.get_key_by_kid(key_id)
+        if not public_key:
+            return {"message": "Failed to export public key."}
+        public_pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
 
-        with open(public_key_filepath, 'wb') as public_key_file:
-            public_key_file.write(public_key_info["public_key"].encode())
+        # Export the private key
+        private_key_entry = self.private_key_store.keys_by_kid.get(key_id, None)
+        if not private_key_entry or private_key_entry[1] != hashlib.sha1(key_passwd.encode()).hexdigest():
+            return {"message": "Failed to export private key."}
+        private_pem = private_key_entry[0].decode('utf-8')
 
-        # Export private key
-        private_key_info = self.get_private_key_by_id(key_id, key_passwd)
-        if not private_key_info:
-            return {"message": "Private key not found or access denied."}, 403
+        # Write both keys to one file
+        with open(filepath, 'w') as pem_out:
+            pem_out.write(public_pem.decode('utf-8'))
+            pem_out.write('\n')
+            pem_out.write(private_pem)
 
-        with open(private_key_filepath, 'wb') as private_key_file:
-            private_key_file.write(private_key_info["private_key"].encode())
-
-        return {"message": "Key pair exported successfully."}, 200
+        return {"message": "Key pair exported successfully."}
