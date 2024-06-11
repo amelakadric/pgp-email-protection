@@ -3,8 +3,10 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 from datetime import datetime
+from key_store_interface import PublicKeyStore as BasePublicKeyStore
+from key_store_interface import PrivateKeyStore as BasePrivateKeyStore
 
-class PublicKeyStore:
+class PublicKeyStore(BasePublicKeyStore):
 
     def __init__(self, filename='key_store.json'):
         self.filename = filename
@@ -103,7 +105,7 @@ class PublicKeyStore:
             backend=default_backend()
         )
 
-class PrivateKeyStore:
+class PrivateKeyStore(BasePrivateKeyStore):
 
     def __init__(self, filename='key_store.json'):
         self.filename = filename
