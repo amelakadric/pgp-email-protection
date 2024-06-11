@@ -1,4 +1,19 @@
 {
-  "public_key_store": {},
-  "private_key_store": {}
+    "public_key_store": {
+        "2716517459940218741": [
+            "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDPe6RKAJMiOcf3HNUIN74wMwjz\n2/BaZh04tLlEOkkWvLQrg2WaKP5jqt3ga5BOwh4naSl8rIAM54u04iyBoGJR/g9b\nDIj+Zc9eA5jNk1HVXR3lmzWiVoMxBqz0djO5M1/RArfNSmaQC5pmDxbW/qdEk1c7\n5i3qWvUlswI8seIXdQIDAQAB\n-----END PUBLIC KEY-----\n",
+            "amce@gmail.com",
+            "2024-06-11T15:35:35.091949",
+            "novi key"
+        ]
+    },
+    "private_key_store": {
+        "2716517459940218741": [
+            "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIC5TBfBgkqhkiG9w0BBQ0wUjAxBgkqhkiG9w0BBQwwJAQQIYdQxw8bP8EoGXHc\nGir39gICCAAwDAYIKoZIhvcNAgkFADAdBglghkgBZQMEASoEEFPqtpyU+X1i2H2z\nPgTxUdgEggKAPOvM7NzT5xewDHz1ouhi7myo1HlL5HwToyT+I09BRcVG+NQ+HSWJ\n4xbrkTPqhQFB1vmBFvfSzDKwiRlETUedZnpkE63wkq9rYu76ub7glaKxVZTlycAd\nNzNQVb5P3FMQ53bQsja8WUMQ7PsO1GHwyD3JQSLvezR8l2vg6OvpIxURB0FF+BwY\nsfYBG9CLJBFWWwYuGsTVNUM/Bc+Wz17eD9TwXuGTVgJF6ayJEC6CJOm47zxStDTO\nno9HogpPD/H5zvnXG/JMMIxTmGk4N9TnFtqZzRqTyri0EpgrBXziXT+bDgufKTwX\nkXysz/NtmTkmhD2lWN00Yfunnj/5CZc1aVF/rFmS0I//Kr1ZGDVLShRfrlZkXTAq\neJU5kBpFvJlveioJuTPMpPvSU+ki6bbRpEGua6Rxoy93sC5TaepJkXn8yTPj7Mo+\nLvmZrf0prPmrv3E4plIYBud/o0cctzVoHeHfol4c2ZuBlavHiZRABFXl4S5Ly1Qx\nWyMJ1sAl06jFcOyT0XMF1QDggi74D++F6DWW2MbJjoRreCV5+XJgqLkIdAxLh9dm\nxPZa8X9781tHHsdXB4pSAPuet9zv5gbBvkCz+KwrS51YnUrtsABlHX6aoRIh3z3A\nTg8NbZcFmAKpCUoO1tayUhdvFguK+wkACAjPmvWZxCv3xB5lqukq32SC1PW3ic7q\nnIhBAHoUbJGeyniAp4zPiAwt7tbkUNR6kFCXf8LPESH/n8APlMORyul5peAT3gCS\nO98Iu2kPRfVQ0t+2DofmFhL2rHBtv2F5h6STMGsI/HMPyromoBJ1WcgwKFNI70xM\n7L6G/2VaFOHqLnuK35iHfOsBve++K6ENDw==\n-----END ENCRYPTED PRIVATE KEY-----\n",
+            "0ec09ef9836da03f1add21e3ef607627e687e790",
+            "amce@gmail.com",
+            "2024-06-11T15:35:35.097946",
+            "novi key"
+        ]
+    }
 }
