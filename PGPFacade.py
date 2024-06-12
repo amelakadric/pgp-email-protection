@@ -63,10 +63,7 @@ class PGPFacade():
     
     # load serialized key -- serialization.load_der_public_key(key_id)
     def get_public_key_id(self, puk):
-        return puk.public_bytes(
-            encoding=serialization.Encoding.DER,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo,
-        )[-64::]
+        return puk.public_numbers().n % (2 ** 64)
     
     def save_to_pgp_file(self, data : bytes, filename : str):
         if not filename.endswith(".pgp"): filename += ".pgp"
@@ -82,23 +79,24 @@ class PGPFacade():
         time_stamp1 = datetime.now()
         data += BYTE_SEPARATOR_SEQ + time_stamp1.__str__().encode() \
              + BYTE_SEPARATOR_SEQ + filename.encode() + PART_BYTE_SEPARATOR_SEQ
-        # data.split(b"|") to split binary data on byte b"|"
-        encr_engine = pgpc.PGPCore(self.sender_prk, self.sender_puk, data)
-        msg_digest = encr_engine.data_signature()
-        l2o_msg_digest = msg_digest[0:2]
 
-        sender_puk_id = self.get_public_key_id(self.sender_puk)
+        if "sign_msg" in options:
+            encr_engine = pgpc.PGPCore(self.sender_prk, self.sender_puk, data)
+            msg_digest = encr_engine.data_signature()
+            l2o_msg_digest = msg_digest[0:2]
+            sender_puk_id = self.get_public_key_id(self.sender_puk)
+            data += msg_digest + BYTE_SEPARATOR_SEQ + \
+                l2o_msg_digest + BYTE_SEPARATOR_SEQ + \
+                str(sender_puk_id).encode() + BYTE_SEPARATOR_SEQ
+
         time_stamp2 = datetime.now()
-        
-        data += msg_digest + BYTE_SEPARATOR_SEQ + l2o_msg_digest \
-            + BYTE_SEPARATOR_SEQ + sender_puk_id \
-            + BYTE_SEPARATOR_SEQ + time_stamp2.__str__().encode()
+        data +=  time_stamp2.__str__().encode()
             
         if "compression" in options:
             data = pgpc.PGPCore(self.sender_prk, self.sender_puk, data).zip().get_data()
 
         receiver_puk_id = self.get_public_key_id(self.receiver_puk)
-        data += PART_BYTE_SEPARATOR_SEQ + receiver_puk_id
+        data += PART_BYTE_SEPARATOR_SEQ + str(receiver_puk_id).encode()
         if "radix64" in options:
             data = pgpc.PGPCore(self.sender_prk, self.sender_puk, data).radix64_encode().get_data()
         self.save_to_pgp_file(data, filename)
@@ -122,10 +120,18 @@ class PGPFacade():
 
         recipient_key_id = session_key_component[0]
 
-        time_stamp2  = signature_component[3]
-        sender_key_id = signature_component[2]
-        l2o_msg_digest = signature_component[1]
-        msg_digest = signature_component[0]
+        if "sign_msg" in options:
+            time_stamp2  = signature_component[3]
+            sender_key_id = signature_component[2]
+            l2o_msg_digest = signature_component[1]
+            msg_digest = signature_component[0]
+            if l2o_msg_digest != msg_digest[0:2]:
+                raise Exception("signature not received correctly")
+            sender_puk : RSAPublicKey = self.public_ks.get_key_by_kid(int(sender_key_id.decode()))
+            pgpc.PGPCore(None, sender_puk, BYTE_SEPARATOR_SEQ.join(message_component) + PART_BYTE_SEPARATOR_SEQ) \
+                .verify_data_signature(msg_digest)
+        else:
+            time_stamp2  = signature_component[0]
 
         filename = message_component[2]
         time_stamp1 = message_component[1]
@@ -143,7 +149,7 @@ if __name__ == "__main__":
         sender_prk_id="prk1_2048", sender_prk_passwd="password",
         sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048"
     )
-    p1.pgp_encrypt_message(b"abc"*10, "pgp_facade_test.pgp", ["compression", "radix64"])
+    p1.pgp_encrypt_message(b"abc"*10, "pgp_facade_test.pgp", ["compression", "radix64", "sign_msg"])
     p1.set_receiver_msg_params(sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048", receiver_prk_id="prk1_2048")
-    p1.pgp_decrypt_message("pgp_facade_test.pgp", ["compression", "radix64"])
+    p1.pgp_decrypt_message("pgp_facade_test.pgp", ["compression", "radix64", "sign_msg"])
 

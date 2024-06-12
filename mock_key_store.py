@@ -14,10 +14,13 @@ for pr_kid in private_kids:
         public_exponent=65537,
         key_size=int(pr_kid[-4::]),
     )
+    #key_data[key_data[pr_kid].public_key().public_numbers().n % (2 ** 64)] = key_data[pr_kid]
 
 # generate public keys
 for pu_kid in public_kids:
     key_data[pu_kid] = key_data[pu_kid.replace("u", "r")].public_key()
+    # print(pu_kid + " -- kid:: " + str(key_data[pu_kid].public_numbers().n % (2 ** 64)))
+    key_data[key_data[pu_kid].public_numbers().n % (2 ** 64)] = key_data[pu_kid]
 
 class MockPUKStore(ksi.PublicKeyStore):
 
@@ -29,6 +32,8 @@ class MockPUKStore(ksi.PublicKeyStore):
         if not isinstance(keyId, int): raise Exception("keyId not of type int")
         if keyId in range(0, len(self.my_kids)):
             return self.my_key_store[self.my_kids[keyId]]
+        elif keyId in self.my_key_store.keys():
+            return self.my_key_store[keyId]
         return None
 
     def get_key_by_uid(self, userId : str) -> int:
