@@ -53,9 +53,12 @@ class PGPCore():
     def generate_session_key(self):
         self.session_key = os.urandom(self.SKEY_SIZE_IN_BYTES)
         return self
-    
+
     def get_session_key(self):
         return self.session_key
+    
+    def get_iv(self):
+        return self.iv
     
     def tripple_des(self):
         if self.session_key is None: self.generate_session_key()
