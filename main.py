@@ -21,7 +21,7 @@ def generate_key_pair():
     name = data.get('name')
     email = data.get('email')
     password = data.get('password')
-    key_size = data.get('key_size', 2048)
+    key_size = int(data.get('key_size', 2048))
 
     key_manager.generate_key_pair(name, email, password, key_size)
     return jsonify({"message": f"Generated {key_size}-bit key pair for {name} ({email})."}), 201

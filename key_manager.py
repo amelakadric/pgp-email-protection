@@ -34,7 +34,7 @@ class KeyManager:
                 key_ring.append({
                     "timestamp": timestamp.isoformat(),
                     "name": name,
-                    "key_id": key_id,
+                    "key_id":   str( key_id),
                     "public_key": public_key.public_bytes(
                         encoding=serialization.Encoding.PEM,
                         format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -56,7 +56,7 @@ class KeyManager:
                     format=serialization.PublicFormat.SubjectPublicKeyInfo
                 ).decode(),
                 "timestamp": timestamp.isoformat(),
-                "key_id": key_id,
+                "key_id": str(key_id),
                 "name": name
             })
         return {"public_key_ring": public_keys}
@@ -83,7 +83,7 @@ class KeyManager:
                     encoding=serialization.Encoding.PEM,
                     format=serialization.PublicFormat.SubjectPublicKeyInfo
                 ).decode(),
-                "key_id": key_id
+                "key_id": str(key_id)
             }
         else:
             return None

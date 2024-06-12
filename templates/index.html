@@ -18,6 +18,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="{{url_for('static', filename='index.js')}}"></script>
   </head>
+  <style>
+    .selected {
+      background-color: #d1ecf1;
+    }
+  </style>
   <body>
     <div class="container mt-5">
       <h1 class="text-center mb-4">Key Manager</h1>
@@ -44,6 +49,15 @@
             <!-- Private keys will be dynamically inserted here -->
           </tbody>
         </table>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#generateKeyModal"
+        >
+          Generate New Key Pair
+        </button>
+
         <h2>Public Key Ring</h2>
         <table
           id="public-keys-table"
@@ -64,108 +78,64 @@
         </table>
       </div>
     </div>
-    <br /><br /><br />
-    <form>
-      <div class="container text-center">
-        <div class="row">
-          <div id="alt_input1">
-            <div class="col">
-              <span class="input-group-text">Enter your message here</span>
-              <textarea
-                class="form-control"
-                aria-label="With textarea"
-                id="input_of_type_textarea"
-              ></textarea>
-            </div>
-          </div>
-          <div id="alt_input2">
-            <div class="col">
-              <label for="input_of_type_file" class="form-label"
-                >Select the file with your message</label
-              >
-              <input
-                class="form-control form-control-lg text-success"
-                id="input_of_type_file"
-                type="file"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col"><br /></div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <input
-              type="checkbox"
-              class="btn-check"
-              id="enc_msg"
-              autocomplete="off"
-            />
-            <label class="btn btn-outline-success" for="enc_msg"
-              >encrypt message</label
-            >
-            <br /><br />
-          </div>
-          <div class="col">
-            <input
-              type="checkbox"
-              class="btn-check"
-              id="sign"
-              autocomplete="off"
-            />
-            <label class="btn btn-outline-success" for="sign"
-              >sign message</label
-            >
-            <br /><br />
-          </div>
-          <div class="col">
-            <input
-              type="checkbox"
-              class="btn-check"
-              id="compress"
-              autocomplete="off"
-            />
-            <label class="btn btn-outline-success" for="compress"
-              >compress message</label
-            >
-            <br /><br />
-          </div>
-          <div class="col">
-            <input
-              type="checkbox"
-              class="btn-check"
-              id="radix64"
-              autocomplete="off"
-            />
-            <label class="btn btn-outline-success" for="radix64"
-              >convert to radix64</label
-            >
-            <br /><br />
-          </div>
-        </div>
 
-        <div class="row">
-          <div class="col"></div>
-          <div class="col">
-            <select
-              class="form-select form-select mb-3"
-              aria-label="Large select example"
-              id="input_type"
-            >
-              <option value="text">text</option>
-              <option value="file">file</option>
-            </select>
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="generateKeyModal"
+      tabindex="-1"
+      aria-labelledby="generateKeyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="generateKeyModalLabel">
+              Generate New Key Pair
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
-          <div class="col"></div>
-          <div class="col">
-            <button type="button" class="btn btn-success" id="encr_message">
-              Submit
-            </button>
+          <div class="modal-body">
+            <form id="generateKeyForm">
+              <div class="mb-3">
+                <label for="keyName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="keyName" required />
+              </div>
+              <div class="mb-3">
+                <label for="keyEmail" class="form-label">User ID (Email)</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="keyEmail"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="keyPassword" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="keyPassword"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="keySize" class="form-label">Key Size</label>
+                <select class="form-select" id="keySize">
+                  <option value="1024">1024</option>
+                  <option value="2048" selected>2048</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Generate</button>
+            </form>
           </div>
-          <div class="col"></div>
         </div>
       </div>
-    </form>
+    </div>
   </body>
 </html>

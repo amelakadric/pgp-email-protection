@@ -1,5 +1,14 @@
 $(document).ready(function () {
   let selector = null;
+  let selectedPrivateKey = {
+    id: null,
+    key: null,
+  };
+  let selectedPublicKey = {
+    id: null,
+    key: null,
+  };
+
   $("#alt_input1").addClass("collapse");
   $("#alt_input2").addClass("collapse");
   $("#input_type").change(function () {
@@ -41,6 +50,7 @@ $(document).ready(function () {
     $.ajax(formdata2);
   });
 
+  // Fetch and display private keys
   $.ajax({
     url: "/list_private_key_ring",
     type: "GET",
@@ -50,15 +60,41 @@ $(document).ready(function () {
 
       data.private_key_ring.forEach((key) => {
         keysTable.append(`
-                <tr>
-                    <td>${key.timestamp}</td>
-                    <td>${key.name}</td>
-                    <td>${key.key_id}</td>
-                    <td><textarea readonly>${key.public_key}</textarea></td>
-                    <td><textarea readonly>${key.private_key}</textarea></td>
-                    <td>${key.user_id}</td>
-                </tr>
-            `);
+                    <tr>
+                        <td>${key.timestamp}</td>
+                        <td>${key.name}</td>
+                        <td class="key-id">${key.key_id}</td>
+                        <td>
+                            <textarea readonly>${key.public_key}</textarea>
+                            <button class="btn btn-sm btn-primary select-my-public-key">Select</button>
+                        </td>
+                        <td>
+                            <textarea readonly>${key.private_key}</textarea>
+                            <button class="btn btn-sm btn-primary select-private-key">Select</button>
+                        </td>
+                        <td>${key.user_id}</td>
+                    </tr>
+                `);
+      });
+
+      $(".select-private-key").click(function () {
+        if (selectedPrivateKey.id) {
+          $(selectedPrivateKey.element).removeClass("selected");
+        }
+        selectedPrivateKey.id = $(this).closest("tr").find(".key-id").text();
+        selectedPrivateKey.key = $(this).siblings("textarea").val();
+        selectedPrivateKey.element = $(this).siblings("textarea");
+        selectedPrivateKey.element.addClass("selected");
+      });
+
+      $(".select-my-public-key").click(function () {
+        if (selectedPublicKey.id) {
+          $(selectedPublicKey.element).removeClass("selected");
+        }
+        selectedPublicKey.id = $(this).closest("tr").find(".key-id").text();
+        selectedPublicKey.key = $(this).siblings("textarea").val();
+        selectedPublicKey.element = $(this).siblings("textarea");
+        selectedPublicKey.element.addClass("selected");
       });
     },
     error: function (error) {
@@ -77,19 +113,60 @@ $(document).ready(function () {
 
       data.public_key_ring.forEach((key) => {
         keysTable.append(`
-                <tr>
-                    <td>${key.timestamp}</td>
-                    <td>${key.name}</td>
-                    <td>${key.key_id}</td>
-                    <td><textarea readonly>${key.public_key}</textarea></td>
-                    <td>${key.user_id}</td>
-                </tr>
-            `);
+                    <tr>
+                        <td>${key.timestamp}</td>
+                        <td>${key.name}</td>
+                        <td class="key-id">${key.key_id}</td>
+                        <td>
+                            <textarea readonly>${key.public_key}</textarea>
+                            <button class="btn btn-sm btn-primary select-public-key">Select</button>
+                        </td>
+                        <td>${key.user_id}</td>
+                    </tr>
+                `);
+      });
+
+      $(".select-public-key").click(function () {
+        if (selectedPublicKey.id) {
+          $(selectedPublicKey.element).removeClass("selected");
+        }
+        selectedPublicKey.id = $(this).closest("tr").find(".key-id").text();
+        selectedPublicKey.key = $(this).siblings("textarea").val();
+        selectedPublicKey.element = $(this).siblings("textarea");
+        selectedPublicKey.element.addClass("selected");
       });
     },
     error: function (error) {
       alert("Error fetching public keys");
       console.log(error);
     },
+  });
+
+  // Handle form submission for generating new key pair
+  $("#generateKeyForm").submit(function (event) {
+    event.preventDefault();
+    const formData = {
+      name: $("#keyName").val(),
+      email: $("#keyEmail").val(),
+      password: $("#keyPassword").val(),
+      key_size: $("#keySize").val(),
+    };
+
+    $.ajax({
+      url: "/generate_key_pair",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(formData),
+      success: function (response) {
+        alert(response.message);
+        $("#generateKeyModal").modal("hide");
+        // Optionally, you could refresh the keys list here
+        location.reload(); // Refreshes the page to show the new key pair
+      },
+      error: function (error) {
+        alert("Error generating key pair");
+        console.log(error);
+      },
+    });
   });
 });
