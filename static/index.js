@@ -73,6 +73,9 @@ $(document).ready(function () {
                             <button class="btn btn-sm btn-primary select-private-key">Select</button>
                         </td>
                         <td>${key.user_id}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger remove-key">Remove</button>
+                        </td>
                     </tr>
                 `);
       });
@@ -95,6 +98,27 @@ $(document).ready(function () {
         selectedPublicKey.key = $(this).siblings("textarea").val();
         selectedPublicKey.element = $(this).siblings("textarea");
         selectedPublicKey.element.addClass("selected");
+      });
+      $(".remove-key").click(function () {
+        const keyId = $(this).closest("tr").find(".key-id").text();
+        if (
+          confirm(`Are you sure you want to remove the key with ID: ${keyId}?`)
+        ) {
+          $.ajax({
+            url: "/remove_key",
+            type: "DELETE",
+            contentType: "application/json",
+            data: JSON.stringify({ key_id: keyId }),
+            success: function (response) {
+              alert(response.message);
+              location.reload(); // Refreshes the page to show the updated key ring
+            },
+            error: function (error) {
+              alert("Error removing key pair");
+              console.log(error);
+            },
+          });
+        }
       });
     },
     error: function (error) {

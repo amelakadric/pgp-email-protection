@@ -51,7 +51,7 @@ def access_private_key():
 @app.route('/remove_key', methods=['DELETE'])
 def remove_key():
     data = request.json
-    key_id = data.get('key_id')
+    key_id = int(data.get('key_id'))
 
     key_manager.remove_key(key_id)
     return jsonify({"message": f"Removed key with ID: {key_id}"}), 200
