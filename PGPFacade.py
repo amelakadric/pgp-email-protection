@@ -20,21 +20,46 @@ class PGPFacade():
         self.sender_puk = None
         self.receiver_puk = None
 
-        if isinstance(sender_prk_id, int):
-            self.sender_prk = self.private_ks.get_key_by_kid(sender_prk_id, sender_prk_passwd)
-        elif isinstance(sender_prk_id, str):
-            self.sender_prk = self.private_ks.get_key_by_uid(sender_prk_id, sender_prk_passwd)
+        if sender_prk_id is not None:
+            if isinstance(sender_prk_id, int):
+                self.sender_prk = self.private_ks.get_key_by_kid(sender_prk_id, sender_prk_passwd)
+            elif isinstance(sender_prk_id, str):
+                self.sender_prk = self.private_ks.get_key_by_uid(sender_prk_id, sender_prk_passwd)
 
-        if isinstance(sender_puk_id, int):
-            self.sender_puk = self.public_ks.get_key_by_kid(sender_puk_id)
-        elif isinstance(sender_puk_id, str):
-            self.sender_puk = self.public_ks.get_key_by_uid(sender_puk_id)
+        if sender_puk_id is not None:
+            if isinstance(sender_puk_id, int):
+                self.sender_puk = self.public_ks.get_key_by_kid(sender_puk_id)
+            elif isinstance(sender_puk_id, str):
+                self.sender_puk = self.public_ks.get_key_by_uid(sender_puk_id)
 
-        if isinstance(receiver_puk_id, int):
-            self.receiver_puk = self.public_ks.get_key_by_kid(receiver_puk_id)
-        elif isinstance(receiver_puk_id, str):
-            self.receiver_puk = self.public_ks.get_key_by_uid(receiver_puk_id)
+        if receiver_puk_id is not None:
+            if isinstance(receiver_puk_id, int):
+                self.receiver_puk = self.public_ks.get_key_by_kid(receiver_puk_id)
+            elif isinstance(receiver_puk_id, str):
+                self.receiver_puk = self.public_ks.get_key_by_uid(receiver_puk_id)
 
+    def set_receiver_msg_params(self, sender_puk_id, receiver_puk_id, receiver_prk_id):
+        self.sender_puk = None
+        self.receiver_puk = None
+        self.receiver_prk = None
+
+        if sender_puk_id is not None:
+            if isinstance(sender_puk_id, int):
+                self.sender_puk = self.public_ks.get_key_by_kid(sender_puk_id)
+            elif isinstance(sender_puk_id, str):
+                self.sender_puk = self.public_ks.get_key_by_uid(sender_puk_id)
+
+        if receiver_puk_id is not None:
+            if isinstance(receiver_puk_id, int):
+                self.receiver_puk = self.public_ks.get_key_by_kid(receiver_puk_id)
+            elif isinstance(receiver_puk_id, str):
+                self.receiver_puk = self.public_ks.get_key_by_uid(receiver_puk_id)
+
+        if receiver_prk_id is not None:
+            if isinstance(receiver_prk_id, int):
+                self.receiver_prk = self.public_ks.get_key_by_kid(receiver_prk_id)
+            elif isinstance(receiver_prk_id, str):
+                self.receiver_prk = self.public_ks.get_key_by_uid(receiver_prk_id)
     
     # load serialized key -- serialization.load_der_public_key(key_id)
     def get_public_key_id(self, puk):
@@ -74,10 +99,14 @@ class PGPFacade():
 
         receiver_puk_id = self.get_public_key_id(self.receiver_puk)
         data += PART_BYTE_SEPARATOR_SEQ + receiver_puk_id
+        if "radix64" in options:
+            data = pgpc.PGPCore(self.sender_prk, self.sender_puk, data).radix64_encode().get_data()
         self.save_to_pgp_file(data, filename)
     
     def pgp_decrypt_message(self, filename : str, options : list):
         msg_data = self.load_pgp_file(filename)
+        if "radix64" in options:
+            msg_data = pgpc.PGPCore(self.receiver_prk, self.receiver_puk, msg_data).radix64_decode().get_data()
         msg_data_parts = msg_data.split(PART_BYTE_SEPARATOR_SEQ)
         session_key_component = None; signature_component = None; message_component = None
         if "compression" in options:
@@ -114,6 +143,7 @@ if __name__ == "__main__":
         sender_prk_id="prk1_2048", sender_prk_passwd="password",
         sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048"
     )
-    p1.pgp_encrypt_message(b"abc"*10, "pgp_facade_test.pgp", ["compression"])
-    p1.pgp_decrypt_message("pgp_facade_test.pgp", ["compression"])
+    p1.pgp_encrypt_message(b"abc"*10, "pgp_facade_test.pgp", ["compression", "radix64"])
+    p1.set_receiver_msg_params(sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048", receiver_prk_id="prk1_2048")
+    p1.pgp_decrypt_message("pgp_facade_test.pgp", ["compression", "radix64"])
 
