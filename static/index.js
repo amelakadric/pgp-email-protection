@@ -22,7 +22,8 @@ $(document).ready(function () {
   $("#alt_input1").collapse("show");
 
   $("#encr_message").click(function () {
-    let site_url = "http://localhost:5000";
+    //let site_url = "http://localhost:5000";
+    let site_url = "";
 
     let formdata1 = {
       enc_msg: $("#enc_msg").is(":checked"),

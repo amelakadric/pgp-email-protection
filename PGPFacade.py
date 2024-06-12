@@ -79,9 +79,30 @@ class PGPFacade():
     def pgp_decrypt_message(self, filename : str, options : list):
         msg_data = self.load_pgp_file(filename)
         msg_data_parts = msg_data.split(PART_BYTE_SEPARATOR_SEQ)
-        session_key_component = msg_data_parts[2].split(BYTE_SEPARATOR_SEQ)
-        signature_component = msg_data_parts[1].split(BYTE_SEPARATOR_SEQ)
-        message_component = msg_data_parts[0].split(BYTE_SEPARATOR_SEQ)
+        session_key_component = None; signature_component = None; message_component = None
+        if "compression" in options:
+            session_key_component = msg_data_parts[1].split(BYTE_SEPARATOR_SEQ)
+            uncompressed_split_data = pgpc.PGPCore(1, 1, msg_data_parts[0]) \
+                .unzip().get_data().split(PART_BYTE_SEPARATOR_SEQ)
+            signature_component = uncompressed_split_data[1].split(BYTE_SEPARATOR_SEQ)
+            message_component = uncompressed_split_data[0].split(BYTE_SEPARATOR_SEQ)
+        else:
+            session_key_component = msg_data_parts[2].split(BYTE_SEPARATOR_SEQ)
+            signature_component = msg_data_parts[1].split(BYTE_SEPARATOR_SEQ)
+            message_component = msg_data_parts[0].split(BYTE_SEPARATOR_SEQ)
+
+        recipient_key_id = session_key_component[0]
+
+        time_stamp2  = signature_component[3]
+        sender_key_id = signature_component[2]
+        l2o_msg_digest = signature_component[1]
+        msg_digest = signature_component[0]
+
+        filename = message_component[2]
+        time_stamp1 = message_component[1]
+        data = message_component[0]
+        print(data.decode("utf-8"))
+
 
 
 
@@ -93,6 +114,6 @@ if __name__ == "__main__":
         sender_prk_id="prk1_2048", sender_prk_passwd="password",
         sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048"
     )
-    p1.pgp_encrypt_message(b"abc"*10, "pgp_facade_test.pgp", [])
-    p1.pgp_decrypt_message("pgp_facade_test.pgp", [])
+    p1.pgp_encrypt_message(b"abc"*10, "pgp_facade_test.pgp", ["compression"])
+    p1.pgp_decrypt_message("pgp_facade_test.pgp", ["compression"])
 
