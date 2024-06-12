@@ -214,6 +214,7 @@ class PrivateKeyStore(BasePrivateKeyStore):
 
     def get_key_by_kid(self, keyId: int, key_passwd: str) -> rsa.RSAPrivateKey:
         key_entry = self.keys_by_kid.get(keyId, None)
+        print(keyId)
         # Verify password using hashed password
         if key_entry and key_entry[1] == hashlib.sha1(key_passwd.encode()).hexdigest():
             return serialization.load_pem_private_key(key_entry[0], password=key_passwd.encode(), backend=default_backend())

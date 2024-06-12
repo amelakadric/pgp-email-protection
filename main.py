@@ -69,7 +69,7 @@ def get_private_key_by_id(key_id):
     data = request.json
     password = data.get('password')
 
-    private_key_info = key_manager.get_private_key_by_id(key_id, password)
+    private_key_info = key_manager.get_private_key_by_id(int(key_id), password)
     if private_key_info:
         return jsonify(private_key_info), 200
     else:

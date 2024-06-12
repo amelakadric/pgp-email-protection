@@ -3,6 +3,7 @@ $(document).ready(function () {
   let selectedPrivateKey = {
     id: null,
     key: null,
+    password: null,
   };
   let selectedPublicKey = {
     id: null,
@@ -83,11 +84,41 @@ $(document).ready(function () {
       $(".select-private-key").click(function () {
         if (selectedPrivateKey.id) {
           $(selectedPrivateKey.element).removeClass("selected");
+          selectedPrivateKey.id = null;
+          selectedPrivateKey.password = null;
         }
         selectedPrivateKey.id = $(this).closest("tr").find(".key-id").text();
         selectedPrivateKey.key = $(this).siblings("textarea").val();
         selectedPrivateKey.element = $(this).siblings("textarea");
-        selectedPrivateKey.element.addClass("selected");
+        $("#passwordModal").modal("show");
+      });
+
+      $("#passwordForm").submit(function (event) {
+        event.preventDefault();
+        selectedPrivateKey.password = $("#privateKeyPassword").val();
+        console.log(selectedPrivateKey.password);
+
+        // Call API to get private key
+        $.ajax({
+          url: `/get_private_key_by_id/${selectedPrivateKey.id}`,
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({ password: selectedPrivateKey.password }),
+          success: function (response) {
+            // If the response is 200, select the element
+            if (!response.key_id) {
+              console.log(response);
+            } else {
+              // Response is successful, select the element
+              selectedPrivateKey.element.addClass("selected");
+              $("#passwordModal").modal("hide");
+            }
+          },
+          error: function (error) {
+            alert("Error fetching private key");
+            console.log(error);
+          },
+        });
       });
 
       $(".select-my-public-key").click(function () {
@@ -99,6 +130,7 @@ $(document).ready(function () {
         selectedPublicKey.element = $(this).siblings("textarea");
         selectedPublicKey.element.addClass("selected");
       });
+
       $(".remove-key").click(function () {
         const keyId = $(this).closest("tr").find(".key-id").text();
         if (
@@ -184,7 +216,6 @@ $(document).ready(function () {
       success: function (response) {
         alert(response.message);
         $("#generateKeyModal").modal("hide");
-        // Optionally, you could refresh the keys list here
         location.reload(); // Refreshes the page to show the new key pair
       },
       error: function (error) {

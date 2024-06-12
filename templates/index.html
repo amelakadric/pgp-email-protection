@@ -17,6 +17,11 @@
     ></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="{{url_for('static', filename='index.js')}}"></script>
+    <style>
+      .selected {
+        background-color: #d1ecf1;
+      }
+    </style>
   </head>
   <body>
     <div class="container mt-5">
@@ -75,7 +80,7 @@
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal for generating new key pair -->
     <div
       class="modal fade"
       id="generateKeyModal"
@@ -128,6 +133,44 @@
                 </select>
               </div>
               <button type="submit" class="btn btn-primary">Generate</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal for entering password -->
+    <div
+      class="modal fade"
+      id="passwordModal"
+      tabindex="-1"
+      aria-labelledby="passwordModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="passwordModalLabel">Enter Password</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="passwordForm">
+              <div class="mb-3">
+                <label for="privateKeyPassword" class="form-label"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="privateKeyPassword"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
             </form>
           </div>
         </div>
