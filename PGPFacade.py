@@ -38,7 +38,8 @@ class PGPFacade():
             elif isinstance(receiver_puk_id, str):
                 self.receiver_puk = self.public_ks.get_key_by_uid(receiver_puk_id)
 
-    def set_receiver_msg_params(self, sender_puk_id, receiver_puk_id, receiver_prk_id):
+    """
+    def set_receiver_msg_params(self, sender_puk_id, receiver_puk_id, receiver_prk_id, receiver_prk_passwd):
         self.sender_puk = None
         self.receiver_puk = None
         self.receiver_prk = None
@@ -57,9 +58,10 @@ class PGPFacade():
 
         if receiver_prk_id is not None:
             if isinstance(receiver_prk_id, int):
-                self.receiver_prk = self.public_ks.get_key_by_kid(receiver_prk_id)
+                self.receiver_prk = self.private_ks.get_key_by_kid(receiver_prk_id, receiver_prk_passwd)
             elif isinstance(receiver_prk_id, str):
-                self.receiver_prk = self.public_ks.get_key_by_uid(receiver_prk_id)
+                self.receiver_prk = self.private_ks.get_key_by_uid(receiver_prk_id, receiver_prk_passwd)
+    """
     
     # load serialized key -- serialization.load_der_public_key(key_id)
     def get_public_key_id(self, puk):
@@ -99,15 +101,15 @@ class PGPFacade():
         if "aes_encrypt" in options:
             aes_pgp_encryptor = pgpc.PGPCore(self.sender_prk, self.sender_puk, data).aes128().encrypt()
             data = aes_pgp_encryptor.get_data()
-            aes_sk = aes_pgp_encryptor.get_session_key()
-            aes_iv = aes_pgp_encryptor.get_iv()
+            aes_sk = pgpc.PGPCore(None, self.receiver_puk, aes_pgp_encryptor.get_session_key()).rsa_publ_encry().get_data()
+            aes_iv = pgpc.PGPCore(None, self.receiver_puk, aes_pgp_encryptor.get_iv()).rsa_publ_encry().get_data()
 
         des3_sk = None; des3_iv = None
         if "3des_encrypt" in options:
             des3_pgp_encryptor = pgpc.PGPCore(self.sender_prk, self.sender_puk, data).tripple_des().encrypt()
             data = des3_pgp_encryptor.get_data()
-            des3_sk = des3_pgp_encryptor.get_session_key()
-            des3_iv = des3_pgp_encryptor.get_iv()
+            des3_sk = pgpc.PGPCore(None, self.receiver_puk, des3_pgp_encryptor.get_session_key()).rsa_publ_encry().get_data()
+            des3_iv = pgpc.PGPCore(None, self.receiver_puk, des3_pgp_encryptor.get_iv()).rsa_publ_encry().get_data()
 
         data += PART_BYTE_SEPARATOR_SEQ
         if "aes_encrypt" in options: data += aes_sk + BYTE_SEPARATOR_SEQ + aes_iv + BYTE_SEPARATOR_SEQ
@@ -118,11 +120,12 @@ class PGPFacade():
         if "radix64" in options:
             data = pgpc.PGPCore(self.sender_prk, self.sender_puk, data).radix64_encode().get_data()
         self.save_to_pgp_file(data, filename)
+
     
-    def pgp_decrypt_message(self, filename : str, password : str, options : list):
+    def pgp_decrypt_message(self, filename : str, passwd : str, options : list):
         msg_data = self.load_pgp_file(filename)
         if "radix64" in options:
-            msg_data = pgpc.PGPCore(self.receiver_prk, self.receiver_puk, msg_data).radix64_decode().get_data()
+            msg_data = pgpc.PGPCore(None, None, msg_data).radix64_decode().get_data()
         msg_data_parts = msg_data.split(PART_BYTE_SEPARATOR_SEQ)
 
         session_key_component = None; signature_component = None; message_component = None
@@ -130,26 +133,29 @@ class PGPFacade():
             session_key_component = msg_data_parts[1].split(BYTE_SEPARATOR_SEQ)
             processed_data = msg_data_parts[0]
 
-        receiver_kid = session_key_component[-1]
-        #sender_prk : RSAPrivateKey = self.private_ks.get_key_by_kid(int(sender_key_id.decode()), password)
-        # rsa decrypt all components except last one
+            receiver_kid = int(session_key_component[-1].decode())
+            receiver_prk : RSAPrivateKey = self.private_ks.get_key_by_kid(receiver_kid, passwd)
+            for i in range(len(session_key_component) - 1):
+                session_key_component[i] = pgpc.PGPCore(
+                    receiver_prk, None, session_key_component[i]).rsa_priv_decry().get_data()
+
         if "3des_encrypt" in options:
             des3_sk = session_key_component[0]
             des3_iv = session_key_component[1]
             if "aes_encrypt" in options:
                 des3_sk = session_key_component[2]
                 des3_iv = session_key_component[3]
-            des3_decryptor = pgpc.PGPCore(self.receiver_prk, self.receiver_puk, processed_data, des3_sk, des3_iv)
+            des3_decryptor = pgpc.PGPCore(None, None, processed_data, des3_sk, des3_iv)
             processed_data = des3_decryptor.tripple_des().decrypt().get_data()
 
         if "aes_encrypt" in options:
             aes_sk = session_key_component[0]
             aes_iv = session_key_component[1]
-            aes_decryptor = pgpc.PGPCore(self.receiver_prk, self.receiver_puk, processed_data, aes_sk, aes_iv)
+            aes_decryptor = pgpc.PGPCore(None, None, processed_data, aes_sk, aes_iv)
             processed_data = aes_decryptor.aes128().decrypt().get_data()
 
         if "compression" in options:
-            processed_data = pgpc.PGPCore(1, 1, processed_data).unzip().get_data()
+            processed_data = pgpc.PGPCore(None, None, processed_data).unzip().get_data()
 
         if "compression" not in options and "aes_encrypt" not in options and "3des_encrypt" not in options:
             session_key_component = msg_data_parts[2].split(BYTE_SEPARATOR_SEQ)
@@ -159,8 +165,6 @@ class PGPFacade():
             split_processed_data = processed_data.split(PART_BYTE_SEPARATOR_SEQ)
             signature_component = split_processed_data[1].split(BYTE_SEPARATOR_SEQ)
             message_component = split_processed_data[0].split(BYTE_SEPARATOR_SEQ)
-
-        recipient_key_id = session_key_component[0]
 
         if "sign_msg" in options:
             time_stamp2  = signature_component[3]
@@ -178,7 +182,7 @@ class PGPFacade():
         filename = message_component[2]
         time_stamp1 = message_component[1]
         data = message_component[0]
-        print(data.decode("utf-8"))
+        return data.decode("utf-8")
 
 
 
@@ -186,12 +190,22 @@ class PGPFacade():
 
 if __name__ == "__main__":
 
+    # test all combinations of options
     p1 = PGPFacade(mks.MockPRKStore(), mks.MockPUKStore())
     p1.set_send_msg_params(
         sender_prk_id="prk1_2048", sender_prk_passwd="password",
         sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048"
     )
-    p1.pgp_encrypt_message(b"abc"*10, "pgp_facade_test.pgp", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
-    p1.set_receiver_msg_params(sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048", receiver_prk_id="prk1_2048")
-    p1.pgp_decrypt_message("pgp_facade_test.pgp", "password", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
+    all_passed = True
+    test_data = b"abcdefgh" * 111
+    options = ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"]
+    sub_options = None
+    for i in range(1 << len(options)):
+        sub_options = [options[j] for j in range(len(options)) if (i & (1 << j))]
+        p1.pgp_encrypt_message(test_data, "pgp_facade_test.pgp", sub_options)
+        rez = p1.pgp_decrypt_message("pgp_facade_test.pgp", "password", sub_options)
+        if rez != test_data.decode("utf-8"):
+            all_passed = False; break
+    if all_passed: print(" [*]\tAll tests passed")
+    else: print(" [X]\tTest failed -- fail options: " + str(sub_options))
 
