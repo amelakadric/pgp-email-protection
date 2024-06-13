@@ -193,6 +193,12 @@ if __name__ == "__main__":
         sender_prk_id="prk1_2048", sender_prk_passwd="password",
         sender_puk_id="puk1_2048", receiver_puk_id="puk1_2048"
     )
+
+    p1.pgp_encrypt_message(b"abcdefgh" * 111, "pgp_facade_test.pgp", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
+    rez = p1.pgp_decrypt_message("pgp_facade_test.pgp", "password", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
+    if rez != "abcdefgh" * 111: raise Exception("Error")
+
+
     all_passed = True
     test_data = b"abcdefgh" * 111
     options = ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"]
