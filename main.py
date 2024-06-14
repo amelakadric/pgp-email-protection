@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, Response
 from key_manager import KeyManager
+from PGPFacade import PGPFacade
 
 app = Flask(__name__)
 app.static_folder = 'static'
@@ -15,19 +16,48 @@ def encrypt():
     try:
         aes_enc_msg = request.form["aes_enc_msg"]
         des3_enc_msg = request.form["des3_enc_msg"]
-        private_key_id = request.form["private_key_id"]
+        private_key_id = int(request.form["private_key_id"])
         private_key_password = request.form["private_key_password"]
-        public_key_id = request.form["public_key_id"]
+        public_key_id = int(request.form["public_key_id"])
         sign = request.form["sign"]
         compress = request.form["compress"]
         radix64 = request.form["radix64"]
         msg_data = None
         if request.form["text_or_file"] == "file":
             msg_data = request.files.get("file").stream.read()
-        else: msg_data = request.form["text"]
-        print(msg_data)
-    finally:
+        else: msg_data = request.form["text"].encode()
+        options = []
+        if aes_enc_msg == "true": options += ["aes_encrypt"]
+        if des3_enc_msg == "true": options += ["3des_encrypt"]
+        if private_key_id != "null": options += [private_key_id]
+        options += [private_key_password]
+        if public_key_id != "null": options += [public_key_id]
+        if sign == "true": options += ["sign_msg"]
+        if compress == "true": options += ["compression"]
+        if radix64 == "true": options += ["radix64"]
+
+        pgpf = PGPFacade(
+            key_manager.get_private_key_store(),
+            key_manager.get_public_key_store()
+        )
+
+        result = None
+        if request.form["op_type"] == "encrypt_message":
+            pgpf.set_send_msg_params(
+                sender_prk_id=private_key_id,
+                sender_prk_passwd=private_key_password,
+                sender_puk_id=private_key_id,
+                receiver_puk_id=public_key_id
+            )
+            result = pgpf.pgp_encrypt_message(data=msg_data, filename="user_request.pgp", options=options)
+        elif request.form["op_type"] == "decrypt_message":
+            result = pgpf.pgp_decrypt_message(data=msg_data, filename="user_request.pgp", passwd=private_key_password, options=options)
+        print(result)
+        return result
+
+    except FileExistsError as e:
         return jsonify({
+            "ERROR": e.args,
             "aes_enc_msg": request.form["aes_enc_msg"],
             "des3_enc_msg": request.form["des3_enc_msg"],
             "private_key_id": request.form["private_key_id"],
@@ -37,6 +67,7 @@ def encrypt():
             "compress": request.form["compress"],
             "radix64": request.form["radix64"],
             "text_or_file": request.form["text_or_file"],
+            "op_type": request.form["op_type"],
         })
 
 @app.route('/generate_key_pair', methods=['POST'])

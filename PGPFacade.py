@@ -99,6 +99,7 @@ class PGPFacade():
         data +=  str(self.get_public_key_id(self.receiver_puk)).encode()
         if "radix64" in options: data = self.encr_radix64(data)
         self.save_to_pgp_file(data, filename)
+        return data
 
     def decr_radix64(self, msg_data):
         msg_data = pgpc.PGPCore(None, None, msg_data).radix64_decode().get_data()
@@ -145,8 +146,14 @@ class PGPFacade():
             .verify_data_signature(msg_digest)
 
     
-    def pgp_decrypt_message(self, filename : str, passwd : str, options : list):
-        msg_data = self.load_pgp_file(filename)
+    def pgp_decrypt_message(self, data, filename : str, passwd : str, options : list):
+        msg_data = None
+        if data != None:
+            print("data")
+            msg_data = data
+        else:
+            print("file")
+            msg_data = self.load_pgp_file(filename)
         if "radix64" in options: msg_data = self.decr_radix64(msg_data)
         msg_data_parts = msg_data.split(PART_BYTE_SEPARATOR_SEQ)
 
@@ -194,7 +201,7 @@ if __name__ == "__main__":
     )
 
     p1.pgp_encrypt_message(b"abcdefgh" * 111, "pgp_facade_test.pgp", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
-    rez = p1.pgp_decrypt_message("pgp_facade_test.pgp", "password", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
+    rez = p1.pgp_decrypt_message(None, "pgp_facade_test.pgp", "password", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
     if rez != "abcdefgh" * 111: raise Exception("Error")
 
     all_passed = True
@@ -204,7 +211,7 @@ if __name__ == "__main__":
     for i in range(1 << len(options)):
         sub_options = [options[j] for j in range(len(options)) if (i & (1 << j))]
         p1.pgp_encrypt_message(test_data, "pgp_facade_test.pgp", sub_options)
-        rez = p1.pgp_decrypt_message("pgp_facade_test.pgp", "password", sub_options)
+        rez = p1.pgp_decrypt_message(None, "pgp_facade_test.pgp", "password", sub_options)
         if rez != test_data.decode("utf-8"):
             all_passed = False; break
     if all_passed: print(" [*]\tAll tests passed")

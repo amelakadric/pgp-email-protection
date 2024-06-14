@@ -23,49 +23,6 @@ $(document).ready(function () {
 
   $("#encr_message").click(function () {
 
-    /*
-    //let site_url = "http://localhost:5000";
-    let site_url = "";
-    //console.log($("#input_of_type_file").prop("files")[0])
-    console.log($("#input_of_type_file").val())
-
-    let formdata1 = {
-      aes_enc_msg: $("#aes_enc_msg").is(":checked"),
-      des3_enc_msg: $("#3des_enc_msg").is(":checked"),
-      private_key_id: selectedPrivateKey.id,
-      private_key_password: selectedPrivateKey.password,
-      public_key_id: selectedPublicKey.id,
-      sign: $("#sign").is(":checked"),
-      compress: $("#compress").is(":checked"),
-      radix64: $("#radix64").is(":checked"),
-      text: $("#input_of_type_textarea").val(),
-      //file: $("#input_of_type_file").prop("files"),
-      file: $("#input_of_type_file").val(),
-      text_or_file: $("#input_type").val(),
-    };
-
-    let formdata2 = {
-      type: "POST",
-      contentType: "application/json",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(formdata1),
-      dataType: "json",
-      url: site_url + "/encr_api",
-      success: function (data) {
-        console.log(JSON.stringify(data));
-      },
-    };
-    $.ajax(formdata2);
-
-    */
-
-
-
-
-
     let form_data = new FormData();
 
     form_data.append("aes_enc_msg", $("#aes_enc_msg").is(":checked"));
@@ -79,8 +36,7 @@ $(document).ready(function () {
     form_data.append("text", $("#input_of_type_textarea").val());
     form_data.append("file", $("#input_of_type_file").prop("files")[0]);
     form_data.append("text_or_file", $("#input_type").val());
-
-
+    form_data.append("op_type", $("#operation_type").val());
 
     $.ajax({
     url : "/encr_api",
@@ -90,6 +46,8 @@ $(document).ready(function () {
     contentType: false,
     success:function(data, textStatus, jqXHR){
         console.log(JSON.stringify(data));
+        $("#input_of_type_textarea").val(data)
+        
     },
     error: function(jqXHR, textStatus, errorThrown){
         //if fails     
@@ -147,7 +105,6 @@ $(document).ready(function () {
       $("#passwordForm").submit(function (event) {
         event.preventDefault();
         selectedPrivateKey.password = $("#privateKeyPassword").val();
-        console.log(selectedPrivateKey.password);
 
         // Call API to get private key
         $.ajax({

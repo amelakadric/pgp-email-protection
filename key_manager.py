@@ -8,6 +8,12 @@ class KeyManager:
     def __init__(self):
         self.public_key_store = PublicKeyStore()
         self.private_key_store = PrivateKeyStore()
+    
+    def get_public_key_store(self):
+        return self.public_key_store
+    
+    def get_private_key_store(self):
+        return self.private_key_store
 
     def generate_key_pair(self, name, email, password, key_size):
         private_key = rsa.generate_private_key(
