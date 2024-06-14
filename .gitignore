@@ -7,3 +7,5 @@ temp_data.txt
 *temp_data*
 *.pgp
 *.pem
+public_key_ring.json
+private_key_ring.json

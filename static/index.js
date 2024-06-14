@@ -22,16 +22,25 @@ $(document).ready(function () {
   $("#alt_input1").collapse("show");
 
   $("#encr_message").click(function () {
+
+    /*
     //let site_url = "http://localhost:5000";
     let site_url = "";
+    //console.log($("#input_of_type_file").prop("files")[0])
+    console.log($("#input_of_type_file").val())
 
     let formdata1 = {
-      enc_msg: $("#enc_msg").is(":checked"),
+      aes_enc_msg: $("#aes_enc_msg").is(":checked"),
+      des3_enc_msg: $("#3des_enc_msg").is(":checked"),
+      private_key_id: selectedPrivateKey.id,
+      private_key_password: selectedPrivateKey.password,
+      public_key_id: selectedPublicKey.id,
       sign: $("#sign").is(":checked"),
       compress: $("#compress").is(":checked"),
       radix64: $("#radix64").is(":checked"),
       text: $("#input_of_type_textarea").val(),
-      file: $("#input_of_type_file")[0].files[0],
+      //file: $("#input_of_type_file").prop("files"),
+      file: $("#input_of_type_file").val(),
       text_or_file: $("#input_type").val(),
     };
 
@@ -50,6 +59,47 @@ $(document).ready(function () {
       },
     };
     $.ajax(formdata2);
+
+    */
+
+
+
+
+
+    let form_data = new FormData();
+
+    form_data.append("aes_enc_msg", $("#aes_enc_msg").is(":checked"));
+    form_data.append("des3_enc_msg", $("#3des_enc_msg").is(":checked"));
+    form_data.append("private_key_id", selectedPrivateKey.id);
+    form_data.append("private_key_password", selectedPrivateKey.password);
+    form_data.append("public_key_id", selectedPublicKey.id);
+    form_data.append("sign", $("#sign").is(":checked"));
+    form_data.append("compress", $("#compress").is(":checked"));
+    form_data.append("radix64", $("#radix64").is(":checked"));
+    form_data.append("text", $("#input_of_type_textarea").val());
+    form_data.append("file", $("#input_of_type_file").prop("files")[0]);
+    form_data.append("text_or_file", $("#input_type").val());
+
+
+
+    $.ajax({
+    url : "/encr_api",
+    type: "POST",
+    data : form_data,
+    processData: false,
+    contentType: false,
+    success:function(data, textStatus, jqXHR){
+        console.log(JSON.stringify(data));
+    },
+    error: function(jqXHR, textStatus, errorThrown){
+        //if fails     
+    }
+});
+
+
+
+
+
   });
 
   // Fetch and display private keys

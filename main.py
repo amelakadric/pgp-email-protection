@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, Response
 from key_manager import KeyManager
 
 app = Flask(__name__)
@@ -12,8 +12,32 @@ def index():
 
 @app.route("/encr_api", methods=["POST"])
 def encrypt():
-    print(request.json)
-    return request.json
+    try:
+        aes_enc_msg = request.form["aes_enc_msg"]
+        des3_enc_msg = request.form["des3_enc_msg"]
+        private_key_id = request.form["private_key_id"]
+        private_key_password = request.form["private_key_password"]
+        public_key_id = request.form["public_key_id"]
+        sign = request.form["sign"]
+        compress = request.form["compress"]
+        radix64 = request.form["radix64"]
+        msg_data = None
+        if request.form["text_or_file"] == "file":
+            msg_data = request.files.get("file").stream.read()
+        else: msg_data = request.form["text"]
+        print(msg_data)
+    finally:
+        return jsonify({
+            "aes_enc_msg": request.form["aes_enc_msg"],
+            "des3_enc_msg": request.form["des3_enc_msg"],
+            "private_key_id": request.form["private_key_id"],
+            "private_key_password": request.form["private_key_password"],
+            "public_key_id": request.form["public_key_id"],
+            "sign": request.form["sign"],
+            "compress": request.form["compress"],
+            "radix64": request.form["radix64"],
+            "text_or_file": request.form["text_or_file"],
+        })
 
 @app.route('/generate_key_pair', methods=['POST'])
 def generate_key_pair():

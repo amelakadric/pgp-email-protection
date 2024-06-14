@@ -100,7 +100,6 @@ class PGPFacade():
         if "radix64" in options: data = self.encr_radix64(data)
         self.save_to_pgp_file(data, filename)
 
-
     def decr_radix64(self, msg_data):
         msg_data = pgpc.PGPCore(None, None, msg_data).radix64_decode().get_data()
         return msg_data
@@ -197,7 +196,6 @@ if __name__ == "__main__":
     p1.pgp_encrypt_message(b"abcdefgh" * 111, "pgp_facade_test.pgp", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
     rez = p1.pgp_decrypt_message("pgp_facade_test.pgp", "password", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
     if rez != "abcdefgh" * 111: raise Exception("Error")
-
 
     all_passed = True
     test_data = b"abcdefgh" * 111
