@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, Response
+from flask import Flask, request, jsonify, render_template, Response, send_file
 from key_manager import KeyManager
 from PGPFacade import PGPFacade
 
@@ -69,6 +69,10 @@ def encrypt():
             "text_or_file": request.form["text_or_file"],
             "op_type": request.form["op_type"],
         })
+
+@app.route("/download")
+def download_file():
+    return send_file("user_request.pgp")
 
 @app.route('/generate_key_pair', methods=['POST'])
 def generate_key_pair():
