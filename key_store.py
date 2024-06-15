@@ -100,6 +100,7 @@ class PublicKeyStore(BasePublicKeyStore):
         return key.public_numbers().n if key else None
 
     def export_key(self, key_id, filepath):
+        print(key_id)
         key_entry = self.keys_by_kid.get(key_id, None)
         if key_entry:
             key = key_entry[0]
@@ -107,7 +108,8 @@ class PublicKeyStore(BasePublicKeyStore):
                 encoding=serialization.Encoding.PEM,
                 format=serialization.PublicFormat.SubjectPublicKeyInfo
             )
-            with open(filepath, 'wb') as pem_out:
+            print(filepath)
+            with open(filepath, 'wb+') as pem_out:
                 pem_out.write(pem)
             return True
         else:

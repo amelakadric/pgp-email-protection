@@ -78,6 +78,7 @@ $(document).ready(function () {
                         <td>${key.user_id}</td>
                         <td>
                             <button class="btn btn-sm btn-danger remove-key">Remove</button>
+                            <button class="btn btn-sm btn-secondary export-public-key" data-bs-toggle="modal" data-bs-target="#exportPublicKeyModal">Export Public Key</button>
                         </td>
                     </tr>
                 `);
@@ -152,6 +153,44 @@ $(document).ready(function () {
             },
           });
         }
+      });
+      // Show export modal when button is clicked
+      $(".export-public-key").on("click", function () {
+        const keyId = $(this).closest("tr").find(".key-id").text();
+
+        // Store key_id in a hidden input in the modal for later use
+        $("#exportPublicKeyModal").find("#keyId").val(keyId);
+
+        $("#exportPublicKeyModal").modal("show");
+      });
+
+      // Handle export form submission
+      $("#exportPublicKeyForm").submit(function (event) {
+        event.preventDefault();
+
+        // Get form values
+        var fileName = $("#exportFileName").val();
+        var keyId = $("#keyId").val(); // Retrieve key_id from hidden input in modal
+        console.log(keyId);
+
+        // Perform API call to export public key
+        $.ajax({
+          type: "POST",
+          url: "/export_public_key",
+          contentType: "application/json",
+          data: JSON.stringify({
+            key_id: keyId,
+            fileName: fileName,
+          }),
+          success: function (response) {
+            alert(response.message); // Display success or error message
+            $("#exportPublicKeyModal").modal("hide");
+          },
+          error: function (error) {
+            alert("Error exporting public key.");
+            console.error(error);
+          },
+        });
       });
     },
     error: function (error) {

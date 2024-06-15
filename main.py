@@ -204,17 +204,24 @@ def import_public_key():
             return jsonify(result), 201
         else:
             return jsonify(result), 400
-@app.route('/export_public_key/<int:key_id>', methods=['POST'])
-def export_public_key(key_id):
-    data = request.json
-    filepath = data.get('filepath')
+        
+@app.route('/export_public_key', methods=['POST'])
+def export_public_key():
+    try:
+        data = request.json
+        key_id = int(data.get('key_id'))
+        fileName = data.get('fileName')
 
-    success = key_manager.export_public_key(key_id, filepath)
-    if success:
-        return jsonify({"message": "Public key exported successfully."}), 200
-    else:
-        return jsonify({"message": "Failed to export public key."}), 400
+        success = key_manager.export_public_key(key_id, f"./exports/{fileName}.pem")
 
+        if success:
+            return jsonify({"message": f"Public key '{key_id}' exported successfully to {fileName}.pem."}), 200
+        else:
+            return jsonify({"message": f"Failed to export public key '{key_id}'."}), 500
+
+    except Exception as e:
+        return jsonify({"message": f"Error exporting public key: {str(e)}"}), 500
+    
 @app.route('/export_private_key/<int:key_id>', methods=['POST'])
 def export_private_key(key_id):
     data = request.json

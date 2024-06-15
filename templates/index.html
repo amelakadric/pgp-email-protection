@@ -372,5 +372,47 @@
         </div>
       </div>
     </div>
+    <!-- Modal for exporting public key -->
+    <div
+      class="modal fade"
+      id="exportPublicKeyModal"
+      tabindex="-1"
+      aria-labelledby="exportPublicKeyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exportPublicKeyModalLabel">
+              Export Public Key
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="exportPublicKeyForm">
+              <input type="hidden" id="keyId" name="keyId" value="" />
+
+              <div class="mb-3">
+                <label for="exportFileName" class="form-label">File Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="exportFileName"
+                  placeholder="Enter file name"
+                  required
+                />
+              </div>
+
+              <button type="submit" class="btn btn-primary">Export</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
