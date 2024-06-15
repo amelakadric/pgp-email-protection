@@ -237,11 +237,16 @@ def export_private_key(key_id):
 @app.route('/export_key_pair/<int:key_id>', methods=['POST'])
 def export_key_pair(key_id):
     data = request.json
-    filepath = data.get('filepath')
+    filename = data.get('filename')
     key_passwd = data.get('password')
+    
+    success = key_manager.export_private_key(int(key_id), f'./exports/{filename}.pem', key_passwd)
+    if success:
+        return jsonify({"message": "Key pair {key_id} exported successfully."}), 200
+    else:
+        return jsonify({"message": "Failed to export key pair."}), 400
 
-    result = key_manager.export_key_pair(key_id, filepath, key_passwd)
-    return jsonify(result), 200 if result['message'] == "Key pair exported successfully." else 400
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

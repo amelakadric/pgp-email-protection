@@ -414,5 +414,61 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal for exporting key pair -->
+    <div
+      class="modal fade"
+      id="exportKeyPairModal"
+      tabindex="-1"
+      aria-labelledby="exportKeyPairModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exportKeyPairModalLabel">
+              Export Key Pair
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="exportKeyPairForm">
+              <input type="hidden" id="keyIdKeyPair" name="keyId" value="" />
+
+              <div class="mb-3">
+                <label for="exportKeyPairFileName" class="form-label"
+                  >File Name</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="exportKeyPairFileName"
+                  placeholder="Enter file name"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="exportKeyPairPassword" class="form-label"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="exportKeyPairPassword"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Export</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

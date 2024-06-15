@@ -79,6 +79,7 @@ $(document).ready(function () {
                         <td>
                             <button class="btn btn-sm btn-danger remove-key">Remove</button>
                             <button class="btn btn-sm btn-secondary export-public-key" data-bs-toggle="modal" data-bs-target="#exportPublicKeyModal">Export Public Key</button>
+                            <button type="button" class="btn btn-secondary export-key-pair" data-bs-toggle="modal" data-bs-target="#exportKeyPairModal">Export Key Pair</button>
                         </td>
                     </tr>
                 `);
@@ -188,6 +189,44 @@ $(document).ready(function () {
           },
           error: function (error) {
             alert("Error exporting public key.");
+            console.error(error);
+          },
+        });
+      });
+      // Show export modal when Export Key Pair button is clicked
+      $(".export-key-pair").click(function () {
+        const keyId = $(this).closest("tr").find(".key-id").text();
+
+        // Store keyId in a hidden input in the modal for later use
+        $("#exportKeyPairModal").find("#keyIdKeyPair").val(keyId);
+
+        $("#exportKeyPairModal").modal("show");
+      });
+
+      // Handle export key pair form submission
+      $("#exportKeyPairForm").submit(function (event) {
+        event.preventDefault();
+
+        var keyId = $("#keyIdKeyPair").val();
+        var filename = $("#exportKeyPairFileName").val();
+        var password = $("#exportKeyPairPassword").val();
+        console.log(keyId, filename, password);
+
+        // Perform API call to export key pair
+        $.ajax({
+          type: "POST",
+          url: "/export_key_pair/" + keyId,
+          contentType: "application/json",
+          data: JSON.stringify({
+            filename: filename,
+            password: password,
+          }),
+          success: function (response) {
+            alert(response.message); // Display success or error message
+            $("#exportKeyPairModal").modal("hide");
+          },
+          error: function (error) {
+            alert("Error exporting key pair.");
             console.error(error);
           },
         });
