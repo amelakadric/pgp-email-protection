@@ -23,6 +23,10 @@ $(document).ready(function () {
 
   $("#encr_message").click(function () {
     let form_data = new FormData();
+    if (selectedPrivateKey.id == null && selectedPublicKey.id == null) {
+      alert("Please select a private key and a public key");
+      return;
+    }
 
     form_data.append("aes_enc_msg", $("#aes_enc_msg").is(":checked"));
     form_data.append("des3_enc_msg", $("#3des_enc_msg").is(":checked"));
