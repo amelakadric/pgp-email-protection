@@ -178,26 +178,3 @@ class KeyManager:
     def import_public_key(self, file_content, user_id, name):
         return self.public_key_store.import_public_key(file_content, user_id, name)
     
-    def export_key_pair(self, key_id, filepath, key_passwd):
-        # Export the public key
-        public_key = self.public_key_store.get_key_by_kid(key_id)
-        if not public_key:
-            return {"message": "Failed to export public key."}
-        public_pem = public_key.public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        )
-
-        # Export the private key
-        private_key_entry = self.private_key_store.keys_by_kid.get(key_id, None)
-        if not private_key_entry or private_key_entry[1] != hashlib.sha1(key_passwd.encode()).hexdigest():
-            return {"message": "Failed to export private key."}
-        private_pem = private_key_entry[0].decode('utf-8')
-
-        # Write both keys to one file
-        with open(filepath, 'w') as pem_out:
-            pem_out.write(public_pem.decode('utf-8'))
-            pem_out.write('\n')
-            pem_out.write(private_pem)
-
-        return {"message": "Key pair exported successfully."}

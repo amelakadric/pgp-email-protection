@@ -220,17 +220,6 @@ def export_public_key():
     except Exception as e:
         return jsonify({"message": f"Error exporting public key: {str(e)}"}), 500
     
-@app.route('/export_private_key/<int:key_id>', methods=['POST'])
-def export_private_key(key_id):
-    data = request.json
-    filepath = data.get('filepath')
-    key_passwd = data.get('password')
-
-    success = key_manager.export_private_key(key_id, filepath, key_passwd)
-    if success:
-        return jsonify({"message": "Private key exported successfully."}), 200
-    else:
-        return jsonify({"message": "Failed to export private key."}), 400
 
 @app.route('/export_key_pair/<int:key_id>', methods=['POST'])
 def export_key_pair(key_id):
