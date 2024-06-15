@@ -69,17 +69,17 @@ $(document).ready(function () {
                         <td class="key-id">${key.key_id}</td>
                         <td>
                             <textarea readonly>${key.public_key}</textarea>
-                            <button class="btn btn-sm btn-primary select-my-public-key">Select</button>
+                            <button class="btn btn-sm btn-success select-my-public-key">Select</button>
                         </td>
                         <td>
                             <textarea readonly>${key.private_key}</textarea>
-                            <button class="btn btn-sm btn-primary select-private-key">Select</button>
+                            <button class="btn btn-sm btn-success select-private-key">Select</button>
                         </td>
                         <td>${key.user_id}</td>
-                        <td>
+                        <td class="action-buttons">
                             <button class="btn btn-sm btn-danger remove-key">Remove</button>
                             <button class="btn btn-sm btn-secondary export-public-key" data-bs-toggle="modal" data-bs-target="#exportPublicKeyModal">Export Public Key</button>
-                            <button type="button" class="btn btn-secondary export-key-pair" data-bs-toggle="modal" data-bs-target="#exportKeyPairModal">Export Key Pair</button>
+                            <button type="button" class="btn btn-sm btn-secondary export-key-pair" data-bs-toggle="modal" data-bs-target="#exportKeyPairModal">Export Key Pair</button>
                         </td>
                     </tr>
                 `);
@@ -252,7 +252,8 @@ $(document).ready(function () {
                         <td class="key-id">${key.key_id}</td>
                         <td>
                             <textarea readonly>${key.public_key}</textarea>
-                            <button class="btn btn-sm btn-primary select-public-key">Select</button>
+                            <br/>
+                            <button class="btn btn-sm btn-success select-public-key">Select</button>
                         </td>
                         <td>${key.user_id}</td>
                     </tr>

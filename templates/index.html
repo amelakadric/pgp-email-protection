@@ -19,7 +19,19 @@
     <script src="{{url_for('static', filename='index.js')}}"></script>
     <style>
       .selected {
-        background-color: #d1ecf1;
+        background-color: #a2d2a2;
+      }
+      .action-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .action-buttons button {
+        margin-bottom: 10px;
+        width: 80%;
+      }
+      #private-keys-table textarea {
+        height: 118px;
       }
     </style>
   </head>
@@ -154,11 +166,12 @@
 
     <div class="container mt-5">
       <h1 class="text-center mb-4">Key Manager</h1>
+      <hr />
       <div
         id="keys-table-container"
         class="table-container table-responsive shadow p-3 mb-5 bg-body rounded"
       >
-        <h2>Private Key Ring</h2>
+        <h2 class="text-center mb-4">Private Key Ring</h2>
         <table
           id="private-keys-table"
           class="table table-striped table-bordered"
@@ -178,25 +191,29 @@
             <!-- Private keys will be dynamically inserted here -->
           </tbody>
         </table>
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#generateKeyModal"
-        >
-          Generate New Key Pair
-        </button>
+        <div class="text-center">
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#generateKeyModal"
+          >
+            Generate New Key Pair
+          </button>
 
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#importKeyPairModal"
-        >
-          Import Key Pair
-        </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#importKeyPairModal"
+          >
+            Import Key Pair
+          </button>
+        </div>
 
-        <h2>Public Key Ring</h2>
+        <hr />
+
+        <h2 class="text-center mb-4">Public Key Ring</h2>
         <table
           id="public-keys-table"
           class="table table-striped table-bordered"
@@ -214,14 +231,16 @@
             <!-- Public keys will be dynamically inserted here -->
           </tbody>
         </table>
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#importPublicKeyModal"
-        >
-          Import Public Key
-        </button>
+        <div class="text-center">
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#importPublicKeyModal"
+          >
+            Import Public Key
+          </button>
+        </div>
       </div>
     </div>
 
