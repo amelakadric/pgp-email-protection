@@ -119,16 +119,14 @@ class PublicKeyStore(BasePublicKeyStore):
             public_key = serialization.load_pem_public_key(pem_data, backend=default_backend())
             self.add_key(public_key, user_id, name)
 
-    def import_public_key(self, filepath, user_id, name):
+    def import_public_key(self, file_content, user_id, name):
         try:
-            with open(filepath, 'rb') as pem_in:
-                pem_data = pem_in.read()
-                public_key = serialization.load_pem_public_key(pem_data, backend=default_backend())
-                self.add_public_key(public_key, user_id, name)
-                return {"message": "Key imported successfully."}
+            public_key = serialization.load_pem_public_key(file_content.encode('utf-8'), backend=default_backend())
+            self.add_public_key(public_key, user_id, name)
+            return {"message": "Key imported successfully."}
         except Exception as e:
             return {"message": "Failed to import key.", "error": str(e)}
-
+        
     @staticmethod
     def serialize_public_key(public_key):
         return public_key.public_bytes(

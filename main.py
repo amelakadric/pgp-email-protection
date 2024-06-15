@@ -186,17 +186,24 @@ def import_key():
     
 @app.route('/import_public_key', methods=['POST'])
 def import_public_key():
-    data = request.json
-    filepath = data.get('filepath')
-    user_id = data.get('user_id')
-    name = data.get('name')
+    if 'file' not in request.files:
+        return jsonify({"message": "No file part in the request"}), 400
 
-    result = key_manager.import_public_key(filepath, user_id, name)
-    if result['message'] == "Key imported successfully.":
-        return jsonify(result), 201
-    else:
-        return jsonify(result), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"message": "No selected file"}), 400
 
+    user_id = request.form.get('user_id')
+    name = request.form.get('name')
+
+    if file:
+        file_content = file.read().decode('utf-8')  # Read the file content
+
+        result = key_manager.import_public_key(file_content, user_id, name)
+        if result['message'] == "Key imported successfully.":
+            return jsonify(result), 201
+        else:
+            return jsonify(result), 400
 @app.route('/export_public_key/<int:key_id>', methods=['POST'])
 def export_public_key(key_id):
     data = request.json

@@ -24,18 +24,8 @@
     </style>
   </head>
   <body>
-
-
-
-
-
-
-
-
-
-
-
-    <br /><br /><br /> <br />
+    <br /><br /><br />
+    <br />
     <form>
       <div class="container text-center">
         <div class="row">
@@ -66,7 +56,6 @@
           <div class="col"><br /></div>
         </div>
         <div class="row">
-
           <div class="col">
             <select
               class="form-select form-select mb-3"
@@ -163,18 +152,6 @@
       </div>
     </form>
 
-
-
-
-
-
-
-
-
-
-
-
-
     <div class="container mt-5">
       <h1 class="text-center mb-4">Key Manager</h1>
       <div
@@ -228,6 +205,14 @@
             <!-- Public keys will be dynamically inserted here -->
           </tbody>
         </table>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#importPublicKeyModal"
+        >
+          Import Public Key
+        </button>
       </div>
     </div>
 
@@ -322,6 +307,66 @@
                 />
               </div>
               <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for importing public key -->
+    <div
+      class="modal fade"
+      id="importPublicKeyModal"
+      tabindex="-1"
+      aria-labelledby="importPublicKeyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="importPublicKeyModalLabel">
+              Import Public Key
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="importPublicKeyForm">
+              <div class="mb-3">
+                <label for="importFile" class="form-label"
+                  >Select Public Key File</label
+                >
+                <input
+                  class="form-control"
+                  type="file"
+                  id="importFile"
+                  accept=".pem,.txt"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="importUserId" class="form-label">User ID</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="importUserId"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="importKeyName" class="form-label">Key Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="importKeyName"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Import</button>
             </form>
           </div>
         </div>

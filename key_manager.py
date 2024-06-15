@@ -176,9 +176,9 @@ class KeyManager:
     def export_private_key(self, key_id, filepath, key_passwd):
         return self.private_key_store.export_key(key_id, filepath, key_passwd)
 
-    def import_public_key(self, filepath, user_id, name):
-        return self.public_key_store.import_public_key(filepath, user_id, name)
-
+    def import_public_key(self, file_content, user_id, name):
+        return self.public_key_store.import_public_key(file_content, user_id, name)
+    
     def export_key_pair(self, key_id, filepath, key_passwd):
         # Export the public key
         public_key = self.public_key_store.get_key_by_kid(key_id)

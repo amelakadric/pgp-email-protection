@@ -22,7 +22,6 @@ $(document).ready(function () {
   $("#alt_input1").collapse("show");
 
   $("#encr_message").click(function () {
-
     let form_data = new FormData();
 
     form_data.append("aes_enc_msg", $("#aes_enc_msg").is(":checked"));
@@ -39,25 +38,19 @@ $(document).ready(function () {
     form_data.append("op_type", $("#operation_type").val());
 
     $.ajax({
-    url : "/encr_api",
-    type: "POST",
-    data : form_data,
-    processData: false,
-    contentType: false,
-    success:function(data, textStatus, jqXHR){
+      url: "/encr_api",
+      type: "POST",
+      data: form_data,
+      processData: false,
+      contentType: false,
+      success: function (data, textStatus, jqXHR) {
         console.log(JSON.stringify(data));
-        $("#input_of_type_textarea").val(data)
-        
-    },
-    error: function(jqXHR, textStatus, errorThrown){
-        //if fails     
-    }
-});
-
-
-
-
-
+        $("#input_of_type_textarea").val(data);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        //if fails
+      },
+    });
   });
 
   // Fetch and display private keys
@@ -228,6 +221,41 @@ $(document).ready(function () {
       },
       error: function (error) {
         alert("Error generating key pair");
+        console.log(error);
+      },
+    });
+  });
+
+  // Handle form submission for importing public key
+  $("#importPublicKeyForm").submit(function (event) {
+    event.preventDefault();
+    const file = $("#importFile")[0].files[0];
+    const userId = $("#importUserId").val();
+    const keyName = $("#importKeyName").val();
+
+    if (!file) {
+      alert("Please select a file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("user_id", userId);
+    formData.append("name", keyName);
+
+    $.ajax({
+      url: "/import_public_key",
+      type: "POST",
+      data: formData,
+      processData: false, // Prevent jQuery from automatically transforming the data into a query string
+      contentType: false, // Prevent jQuery from overriding the Content-Type header
+      success: function (response) {
+        alert(response.message);
+        $("#importPublicKeyModal").modal("hide");
+        location.reload(); // Refreshes the page to show the imported key
+      },
+      error: function (error) {
+        alert("Error importing public key");
         console.log(error);
       },
     });
