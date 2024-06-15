@@ -187,6 +187,15 @@
           Generate New Key Pair
         </button>
 
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#importKeyPairModal"
+        >
+          Import Key Pair
+        </button>
+
         <h2>Public Key Ring</h2>
         <table
           id="public-keys-table"
@@ -465,6 +474,80 @@
                 />
               </div>
               <button type="submit" class="btn btn-primary">Export</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal for importing key pair -->
+    <div
+      class="modal fade"
+      id="importKeyPairModal"
+      tabindex="-1"
+      aria-labelledby="importKeyPairModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="importKeyPairModalLabel">
+              Import Key Pair
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="importKeyPairForm">
+              <div class="mb-3">
+                <label for="importKeyPairFile" class="form-label"
+                  >Select Key Pair File</label
+                >
+                <input
+                  class="form-control"
+                  type="file"
+                  id="importKeyPairFile"
+                  accept=".pem,.txt"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="importKeyPairUserId" class="form-label"
+                  >User ID</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="importKeyPairUserId"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="importKeyPairName" class="form-label"
+                  >Key Name</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="importKeyPairName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="importKeyPairPassword" class="form-label"
+                  >Key Password</label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="importKeyPairPassword"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Import</button>
             </form>
           </div>
         </div>

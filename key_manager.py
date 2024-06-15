@@ -166,10 +166,9 @@ class KeyManager:
         else:
             return None
 
-    def import_key(self, filepath, user_id, key_passwd, name):
-        result = self.private_key_store.import_key(filepath, user_id, key_passwd, name)
-        return result
-
+    def import_key(self, file_content, user_id, key_passwd, name):
+        return self.private_key_store.import_key(file_content, user_id, key_passwd, name, public_key_store=self.public_key_store)
+    
     def export_public_key(self, key_id, filepath):
         return self.public_key_store.export_key(key_id, filepath)
 

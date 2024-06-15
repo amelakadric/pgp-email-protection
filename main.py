@@ -170,19 +170,17 @@ def get_private_key_by_name(name):
         return jsonify({"message": "Private key not found or access denied."}), 403
 
 
-@app.route('/import_key', methods=['POST'])
-def import_key():
-    data = request.json
-    filepath = data.get('filepath')
-    user_id = data.get('user_id')
-    key_passwd = data.get('password')
-    name = data.get('name')
+@app.route('/import_key_pair', methods=['POST'])
+def import_key_pair():
+    file = request.files['file']
+    user_id = request.form['user_id']
+    name = request.form['name']
+    password = request.form['password']
+    file_content = file.read()
 
-    result = key_manager.import_key(filepath, user_id, key_passwd, name)
-    if result['message'] == "Key imported successfully.":
-        return jsonify(result), 201
-    else:
-        return jsonify(result), 400
+    result = key_manager.import_key(file_content, user_id, name, password)
+    return jsonify(result), 201 if result['message'] == "Key pair imported successfully." else 400
+
     
 @app.route('/import_public_key', methods=['POST'])
 def import_public_key():

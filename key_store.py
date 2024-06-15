@@ -240,14 +240,17 @@ class PrivateKeyStore(BasePrivateKeyStore):
         else:
             return False
 
-    def import_key(self, filepath, user_id, key_passwd, name):
+    def import_key(self, file_content, user_id, key_passwd, name, public_key_store):
         try:
-            with open(filepath, 'rb') as pem_in:
-                pem_data = pem_in.read()
-                private_key = serialization.load_pem_private_key(pem_data, password=key_passwd.encode(), backend=default_backend())
-                public_key = private_key.public_key()
-                self.add_key(public_key, private_key, user_id, key_passwd, name)
-                return {"message": "Key imported successfully."}
+            private_key = serialization.load_pem_private_key(
+                file_content, password=key_passwd.encode(), backend=default_backend()
+            )
+            public_key = private_key.public_key()
+            self.add_key(public_key, private_key, user_id, key_passwd, name)
+            public_key_store.add_key(public_key, user_id, name)
+            
+            return {"message": "Key pair imported successfully."}
         except Exception as e:
+            print(f"Error importing key: {str(e)}")  # Add logging
             return {"message": "Failed to import key.", "error": str(e)}
 

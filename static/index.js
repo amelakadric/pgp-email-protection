@@ -172,7 +172,6 @@ $(document).ready(function () {
         // Get form values
         var fileName = $("#exportFileName").val();
         var keyId = $("#keyId").val(); // Retrieve key_id from hidden input in modal
-        console.log(keyId);
 
         // Perform API call to export public key
         $.ajax({
@@ -210,7 +209,6 @@ $(document).ready(function () {
         var keyId = $("#keyIdKeyPair").val();
         var filename = $("#exportKeyPairFileName").val();
         var password = $("#exportKeyPairPassword").val();
-        console.log(keyId, filename, password);
 
         // Perform API call to export key pair
         $.ajax({
@@ -334,6 +332,42 @@ $(document).ready(function () {
       },
       error: function (error) {
         alert("Error importing public key");
+        console.log(error);
+      },
+    });
+  });
+
+  $("#importKeyPairForm").submit(function (event) {
+    event.preventDefault();
+    const file = $("#importKeyPairFile")[0].files[0];
+    const userId = $("#importKeyPairUserId").val();
+    const keyName = $("#importKeyPairName").val();
+    const keyPassword = $("#importKeyPairPassword").val();
+
+    if (!file) {
+      alert("Please select a file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("user_id", userId);
+    formData.append("name", keyName);
+    formData.append("password", keyPassword);
+
+    $.ajax({
+      url: "/import_key_pair",
+      type: "POST",
+      data: formData,
+      processData: false, // Prevent jQuery from automatically transforming the data into a query string
+      contentType: false, // Prevent jQuery from overriding the Content-Type header
+      success: function (response) {
+        alert(response.message);
+        $("#importKeyPairModal").modal("hide");
+        location.reload(); // Refreshes the page to show the imported key
+      },
+      error: function (error) {
+        alert("Error importing key pair");
         console.log(error);
       },
     });
