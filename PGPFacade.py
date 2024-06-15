@@ -149,10 +149,8 @@ class PGPFacade():
     def pgp_decrypt_message(self, data, filename : str, passwd : str, options : list):
         msg_data = None
         if data != None:
-            print("data")
             msg_data = data
         else:
-            print("file")
             msg_data = self.load_pgp_file(filename)
         if "radix64" in options: msg_data = self.decr_radix64(msg_data)
         msg_data_parts = msg_data.split(PART_BYTE_SEPARATOR_SEQ)
@@ -185,10 +183,12 @@ class PGPFacade():
             self.decr_sign_message(signature_component, message_component)
         else: time_stamp2  = signature_component[0]
 
-        filename = message_component[2]
+        # filename = message_component[2]
         time_stamp1 = message_component[1]
         data = message_component[0]
-        return data.decode("utf-8")
+        self.save_to_pgp_file(data, filename)
+        #return data.decode("utf-8")
+        return data
 
 # tests for this class
 if __name__ == "__main__":
@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
     p1.pgp_encrypt_message(b"abcdefgh" * 111, "pgp_facade_test.pgp", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
     rez = p1.pgp_decrypt_message(None, "pgp_facade_test.pgp", "password", ["compression", "radix64", "sign_msg", "aes_encrypt", "3des_encrypt"])
-    if rez != "abcdefgh" * 111: raise Exception("Error")
+    if rez != b"abcdefgh" * 111: raise Exception("Error")
 
     all_passed = True
     test_data = b"abcdefgh" * 111
@@ -212,7 +212,7 @@ if __name__ == "__main__":
         sub_options = [options[j] for j in range(len(options)) if (i & (1 << j))]
         p1.pgp_encrypt_message(test_data, "pgp_facade_test.pgp", sub_options)
         rez = p1.pgp_decrypt_message(None, "pgp_facade_test.pgp", "password", sub_options)
-        if rez != test_data.decode("utf-8"):
+        if rez != test_data:
             all_passed = False; break
     if all_passed: print(" [*]\tAll tests passed")
     else: print(" [X]\tTest failed -- fail options: " + str(sub_options))
