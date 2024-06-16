@@ -37,17 +37,17 @@ class PGPCore():
     def data_signature(self):
         return self.private_key.sign(
             self.data, padding.PSS(
-                mgf=padding.MGF1(hashes.SHA1()),
+                mgf=padding.MGF1(hashes.SHA256()),
                 salt_length=padding.PSS.MAX_LENGTH),
-            hashes.SHA1()
+            hashes.SHA256()
         )
 
     def verify_data_signature(self, signature):
         return self.public_key.verify(
             signature, self.data, padding.PSS(
-                mgf=padding.MGF1(hashes.SHA1()),
+                mgf=padding.MGF1(hashes.SHA256()),
                 salt_length=padding.PSS.MAX_LENGTH),
-            hashes.SHA1()
+            hashes.SHA256()
         )
     
     def generate_session_key(self):
