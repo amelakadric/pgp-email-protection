@@ -1,28 +1,10 @@
 {
     "public_key_store": {
-        "2716517459940218741": [
-            "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDPe6RKAJMiOcf3HNUIN74wMwjz\n2/BaZh04tLlEOkkWvLQrg2WaKP5jqt3ga5BOwh4naSl8rIAM54u04iyBoGJR/g9b\nDIj+Zc9eA5jNk1HVXR3lmzWiVoMxBqz0djO5M1/RArfNSmaQC5pmDxbW/qdEk1c7\n5i3qWvUlswI8seIXdQIDAQAB\n-----END PUBLIC KEY-----\n",
-            "novi neki",
-            "2024-06-12T00:09:22.301198",
-            "nameeee"
-        ],
-        "3081008581047875693": [
-            "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqCufSbBUrkDCRZui6AOj\nCGjdCPMBsVA0fWjHjj1emzb7MkF7nxe6zcnWQtS0FmBUrGv28BcWPfrbfVWaKeTR\nngqCTEntUOjneabKjz95vXkT7TtX8INmUG8osfKyTQd3i+vUvoahu9tOMTY+cW1F\npXfHcbei3AOvzIG2knLRVjEeCTLX8UnbOi4lOlQCW+pRJQxRpgwgZwN3cBaQS2TY\nAXfIpw/oa7zDqQAIBSVTc1glEZyZH2HvmQRkuVzPdc6uAs2QciU9apWnEMsvj86h\nwsXbUH7t8Kxjqz83qL2Yc2+r1xhZSPC9/ID6tUWbmghMMx3HWyHj45MqwfD7B0n4\nbQIDAQAB\n-----END PUBLIC KEY-----\n",
-            "proba2",
-            "2024-06-12T13:28:15.052065",
-            "imeime"
-        ],
-        "13697319450390451581": [
-            "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn54DTF4Tiick0KGT6431\nIabwLdkbmNK73HjjVsvT+F7XAWrnvWfS7mhTPnvrnVrhi3VrlZdtAViKYmQRyF94\nTVuiB/UPIlS3NjZHiOIYzjPux3kklZpc4HP79Kh8lecRwYtvva4NiZPGROoGfMnX\nA2CmdIr656rCEQHKhmsXXwcofbaFWfu5DNd3nGEhta5LS+00nzpIl/vy+zKZkrzd\nb7NF9ZoYBwdXb8Lbscj3efYRiVALpfu/icayCbDEBbKDSn7X6mUh/1wWJAWXU3U1\n13QueQD/c9OtP7a0uRl+zYFCCNHykuaPh1iEJc5E+1GD5iozxCXj/za+Fqd395JV\nfQIDAQAB\n-----END PUBLIC KEY-----\n",
-            "ajmo@if.com",
-            "2024-06-15T12:14:37.005713",
-            "ajmooo"
-        ],
-        "3832923622718872135": [
-            "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDRonEqz9/BoRfHii1zU4A+wEmb\nLG9o1q9c6qj5vUE2QOzGrmKqiD3faqfk5TjgBmAGUmsHh5UU6XFLOoZTVftsagv2\np/RElgeN1i11q4z+DqzTaV1mutuZBOV4PZ15ga3DMhRHhNrZBZjQT8lkBqsQI7RS\nRgIMXQQ1MUe6J1yaRwIDAQAB\n-----END PUBLIC KEY-----\n",
-            "ddwdw@fesf.dsa",
-            "2024-06-15T21:36:17.376514",
-            "sedfewf"
+        "2852790125664220377": [
+            "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj+6fvufODkwTzpMyJeQq\nb020IWXfzR2YgOYQXPSyuh/xmYNUbKxWdV7LPrJc9n9VimMFwIxmnC1uo6L2otSf\nU52/vq9o0CAvuaPrGfz18IGXWS7Pb05M+bZs6ErdFaAqXX5UImFrkMyveGNyCnwQ\nDgkUoo5KdRSUvynqYIGCrM9/nkjkOadmp7yChYMgRer8JKC6nujqAzzcdJn/+wNW\nGAABKaJdqlS/m/XQ3oqW8YPhSJkKqtZtQrrbpPxniFMJmAvvre8IL7Sb5xvy+PoJ\nxc/kQF85HBxQopArwbO3RMQU3ZyjehcneFOBGfiAdXVXkZ4WeydEIzsnlyWBKvU0\n2QIDAQAB\n-----END PUBLIC KEY-----\n",
+            "treci_korisnik@treci.kljuc",
+            "2024-06-16T20:14:46.128142",
+            "treci_kljuc"
         ]
     }
 }

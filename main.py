@@ -178,7 +178,7 @@ def import_key_pair():
     password = request.form['password']
     file_content = file.read()
 
-    result = key_manager.import_key(file_content, user_id, name, password)
+    result = key_manager.import_key(file_content, user_id, password, name)
     return jsonify(result), 201 if result['message'] == "Key pair imported successfully." else 400
 
     

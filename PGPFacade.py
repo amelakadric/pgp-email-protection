@@ -88,7 +88,7 @@ class PGPFacade():
         data += BYTE_SEPARATOR_SEQ + time_stamp1.__str__().encode() \
              + BYTE_SEPARATOR_SEQ + filename.encode() + PART_BYTE_SEPARATOR_SEQ
         if "sign_msg" in options: data = self.encr_sign_message(data)
-        time_stamp2 = datetime.now(); data +=  time_stamp2.__str__().encode()
+        time_stamp2 = datetime.now(); data += time_stamp2.__str__().encode()
         if "compression" in options: data = self.encr_compression(data)
         aes_sk = None; aes_iv = None; des3_sk = None; des3_iv = None
         if "aes_encrypt" in options: data, aes_sk, aes_iv = self.encr_aes(data)
